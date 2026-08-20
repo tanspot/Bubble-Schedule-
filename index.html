@@ -1,17 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
 <title>Bubble Schedule</title>
 
+<!-- iPhone / Home Screen App Settings -->
+<meta
+  name="apple-mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="default"
+>
+
+<meta
+  name="apple-mobile-web-app-title"
+  content="Bubble Schedule"
+>
+
+<meta
+  name="mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="theme-color"
+  content="#d9c7ff"
+>
+
+<!-- Bubble Schedule App Icon -->
+<link
+  rel="icon"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffd3e8'/%3E%3Cstop offset='.5' stop-color='%23d8cff9'/%3E%3Cstop offset='1' stop-color='%23c7edff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='110' fill='url(%23g)'/%3E%3Ccircle cx='210' cy='270' r='125' fill='white' fill-opacity='.8'/%3E%3Ccircle cx='330' cy='175' r='70' fill='white' fill-opacity='.65'/%3E%3Ccircle cx='115' cy='155' r='45' fill='white' fill-opacity='.7'/%3E%3Cpath d='M382 82l10 27 27 10-27 10-10 27-10-27-27-10 27-10z' fill='white'/%3E%3Cpath d='M390 275l7 19 19 7-19 7-7 19-7-19-19-7 19-7z' fill='white'/%3E%3C/svg%3E"
+>
+
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: #f8f5ff;
 }
 
 body {
@@ -24,6 +67,13 @@ body {
     radial-gradient(circle at 8% 8%, #ffd9ec, transparent 30%),
     radial-gradient(circle at 92% 90%, #ccecff, transparent 32%),
     linear-gradient(135deg, #faf2ff, #edfaff);
+
+  /* iPhone safe areas */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
 
 button,
@@ -46,20 +96,27 @@ button {
 
 #loginScreen {
   min-height: 100vh;
+  min-height: 100dvh;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 25px;
 }
 
 .login-card {
   width: 100%;
   max-width: 430px;
+
   padding: 35px 26px;
+
   text-align: center;
 
   background: rgba(255,255,255,.88);
+
   backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 
   border-radius: 30px;
 
@@ -100,7 +157,9 @@ button {
 
 h1 {
   margin: 0 0 8px;
+
   font-size: 32px;
+
   color: #5a4b68;
 }
 
@@ -121,6 +180,7 @@ h3 {
 
 .input-group label {
   display: block;
+
   margin-bottom: 7px;
 
   font-size: 14px;
@@ -227,12 +287,16 @@ h3 {
 
 #app {
   min-height: 100vh;
+  min-height: 100dvh;
 
-  padding-bottom: 95px;
+  padding-bottom: 110px;
 }
 
 .topbar {
-  padding: 22px 20px;
+  padding:
+    22px
+    20px
+    18px;
 
   display: flex;
 
@@ -519,12 +583,18 @@ h3 {
   font-size: 25px;
 }
 
+.member-info {
+  min-width: 0;
+}
+
 .member-info strong {
   display: block;
 
   color: #5d5067;
 
   font-size: 17px;
+
+  overflow-wrap: anywhere;
 }
 
 .member-info span {
@@ -537,6 +607,8 @@ h3 {
   font-size: 13px;
 
   text-transform: capitalize;
+
+  overflow-wrap: anywhere;
 }
 
 .member-actions {
@@ -590,6 +662,8 @@ h3 {
   color: #806796;
 
   font-weight: 800;
+
+  white-space: nowrap;
 }
 
 .shift-employee {
@@ -631,7 +705,7 @@ h3 {
 
   left: 50%;
 
-  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
 
   transform: translateX(-50%);
 
@@ -650,6 +724,7 @@ h3 {
     rgba(255,255,255,.92);
 
   backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 
   border-radius: 23px;
 
@@ -697,6 +772,13 @@ h3 {
   padding: 25px;
 }
 
+.muted {
+  color: #91879c;
+  font-size: 13px;
+}
+
+
+/* IPHONE */
 
 @media (max-width: 500px) {
 
@@ -706,6 +788,49 @@ h3 {
 
   .hero h2 {
     font-size: 23px;
+  }
+
+  .topbar {
+    padding-top: 18px;
+  }
+
+  .member-actions {
+    flex-direction: column;
+  }
+
+  .member-actions button {
+    width: 100%;
+  }
+
+}
+
+
+/* SMALL PHONES */
+
+@media (max-width: 360px) {
+
+  .container {
+    width: calc(100% - 20px);
+  }
+
+  .hero {
+    padding: 20px;
+  }
+
+  .grid {
+    gap: 10px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .brand strong {
+    font-size: 16px;
+  }
+
+  .logout-button {
+    padding: 8px 10px;
   }
 
 }
@@ -746,6 +871,7 @@ h3 {
           id="email"
           type="email"
           placeholder="you@example.com"
+          autocomplete="email"
           required
         >
 
@@ -762,6 +888,7 @@ h3 {
           id="password"
           type="password"
           placeholder="Your password"
+          autocomplete="current-password"
           required
         >
 
@@ -1484,10 +1611,13 @@ h3 {
       class="nav-button active"
       data-view="home"
     >
+
       <span class="nav-icon">
         🏠
       </span>
+
       Home
+
     </button>
 
 
@@ -1495,10 +1625,13 @@ h3 {
       class="nav-button"
       data-view="schedule"
     >
+
       <span class="nav-icon">
         📅
       </span>
+
       Schedule
+
     </button>
 
 
@@ -1506,10 +1639,13 @@ h3 {
       class="nav-button"
       data-view="team"
     >
+
       <span class="nav-icon">
         👥
       </span>
+
       Team
+
     </button>
 
 
@@ -1517,10 +1653,13 @@ h3 {
       class="nav-button"
       data-view="settings"
     >
+
       <span class="nav-icon">
         ⚙️
       </span>
+
       Settings
+
     </button>
 
   </nav>
@@ -1705,32 +1844,32 @@ async function showApp(user) {
 
   element("welcome")
     .textContent =
-      profile.full_name
-        ? "Welcome, " +
-          profile.full_name +
-          "!"
-        : "Welcome!";
+    profile.full_name
+      ? "Welcome, " +
+        profile.full_name +
+        "!"
+      : "Welcome!";
 
 
   element("roleDisplay")
     .textContent =
-      profile.role || "";
+    profile.role || "";
 
 
   element("settingsName")
     .textContent =
-      profile.full_name ||
-      "Account";
+    profile.full_name ||
+    "Account";
 
 
   element("settingsEmail")
     .textContent =
-      user.email || "";
+    user.email || "";
 
 
   element("settingsRole")
     .textContent =
-      profile.role || "";
+    profile.role || "";
 
 
   if (isManager()) {
