@@ -990,21 +990,7 @@ async function loadTeam() {
 
   list.innerHTML = data.map(member => `
 
-  <div class="card" style="
-    padding:20px;
-    position:relative;
-    overflow:hidden;
-  ">
-
-    <div style="
-      position:absolute;
-      right:-15px;
-      top:-20px;
-      width:70px;
-      height:70px;
-      border-radius:50%;
-      background:rgba(255,255,255,.45);
-    "></div>
+  <div class="card" style="position:relative;">
 
     <div class="schedule-row">
 
@@ -1014,43 +1000,40 @@ async function loadTeam() {
         border-radius:18px;
         display:grid;
         place-items:center;
-        background:linear-gradient(
-          145deg,
-          #ffd6e9,
-          #d8cff9,
-          #c6eafa
-        );
+        background:linear-gradient(145deg,#ffd6e9,#d8cff9,#c6eafa);
         font-size:25px;
-        box-shadow:
-          inset 5px 5px 10px rgba(255,255,255,.7),
-          0 7px 15px rgba(150,120,180,.12);
       ">
         ${member.role === "manager" ? "👑" : "🫧"}
       </div>
 
       <div class="schedule-info">
-
-        <strong style="font-size:16px;">
-          ${member.full_name}
-        </strong>
-
-        <span>
-          ${member.role === "manager"
-            ? "Manager"
-            : "Employee"}
-        </span>
-
+        <strong>${member.full_name}</strong>
+        <span>${member.role}</span>
       </div>
 
-      <div class="pill" style="
-        background:${
-          member.role === "manager"
-            ? "#eadfff"
-            : "#dff2fb"
-        };
-      ">
-        ${member.role}
-      </div>
+    </div>
+
+    <div style="
+      display:flex;
+      gap:8px;
+      margin-top:15px;
+    ">
+
+      <button
+        type="button"
+        onclick="removeTeamMember('${member.id}')"
+        style="
+          flex:1;
+          border:0;
+          padding:11px;
+          border-radius:14px;
+          background:#f8dfe9;
+          color:#a45877;
+          font-weight:700;
+        "
+      >
+        Remove
+      </button>
 
     </div>
 
