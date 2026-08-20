@@ -694,10 +694,10 @@ select {
       Messages
     </button>
 
-    <button class="nav-item">
-      <span>👥</span>
-      Team
-    </button>
+       <button class="nav-item" id="teamNavButton">
+  <span>👥</span>
+  Team
+</button>
 
     <button class="nav-item">
       <span>☁️</span>
@@ -707,9 +707,105 @@ select {
   </nav>
 
 </section>
+<section id="teamScreen" style="display:none;">
 
+  <div class="app-container">
 
-<script>
+    <div class="topbar">
+      <div class="brand">🫧 My Team</div>
+
+      <button
+        id="teamBackButton"
+        class="notification"
+        type="button"
+      >
+        ←
+      </button>
+    </div>
+
+    <div class="hero">
+      <h3>Your Team 💗</h3>
+      <p>Manage the people who make your business sparkle.</p>
+    </div>
+
+    <div class="section-title">
+      <h3>Team Members</h3>
+      <span id="teamCount">0 members</span>
+    </div>
+
+    <div class="card">
+
+      <button
+        id="showAddTeam"
+        class="primary-button"
+        type="button"
+        style="margin-top:0;"
+      >
+        + Add Team Member 🫧
+      </button>
+
+    </div>
+
+    <div
+      id="addTeamForm"
+      class="card"
+      style="display:none;"
+    >
+
+      <h3 style="margin-top:0;">
+        Add someone to your team
+      </h3>
+
+      <div class="field">
+
+        <label>Full name</label>
+
+        <input
+          id="newTeamName"
+          type="text"
+          placeholder="Employee name"
+        >
+
+      </div>
+
+      <div class="field">
+
+        <label>Role</label>
+
+        <select id="newTeamRole">
+
+          <option value="employee">
+            Employee
+          </option>
+
+          <option value="manager">
+            Manager
+          </option>
+
+        </select>
+
+      </div>
+
+      <button
+        id="saveTeamMember"
+        class="primary-button"
+        type="button"
+      >
+        Save Team Member ✨
+      </button>
+
+      <div
+        id="teamFormMessage"
+        class="error"
+      ></div>
+
+    </div>
+
+    <div id="teamList"></div>
+
+  </div>
+
+</section><script>
 
 const SUPABASE_URL =
   "https://sflhmsbqlrgkcukwcewj.supabase.co";
@@ -817,6 +913,174 @@ async function checkSession() {
 
 
 checkSession();
+  document.getElementById("teamNavButton")
+  .addEventListener("click", async function () {
+
+    document.getElementById("app").style.display = "none";
+    document.getElementById("teamScreen").style.display = "block";
+
+    await loadTeam();
+
+  });
+
+
+document.getElementById("teamBackButton")
+  .addEventListener("click", function () {
+
+    document.getElementById("teamScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+  });
+
+
+document.getElementById("showAddTeam")
+  .addEventListener("click", function () {
+
+    const form =
+      document.getElementById("addTeamForm");
+
+    form.style.display =
+      form.style.display === "none"
+        ? "block"
+        : "none";
+
+  });
+
+
+async function loadTeam() {
+
+  const list =
+    document.getElementById("teamList");
+
+  list.innerHTML = "Loading your team...";
+
+  const { data, error } =
+    await supabaseClient
+      .from("team_members")
+      .select("id, full_name, role")
+      .order("full_name");
+
+  if (error) {
+
+    list.innerHTML =
+      '<div class="card">Unable to load team members.</div>';
+
+    return;
+
+  }
+
+  document.getElementById("teamCount").textContent =
+    data.length +
+    (data.length === 1 ? " member" : " members");
+
+  if (!data.length) {
+
+    list.innerHTML = `
+      <div class="card">
+        <strong>No team members yet 🫧</strong>
+        <p style="color:#91879c;">
+          Add your first employee above.
+        </p>
+      </div>
+    `;
+
+    return;
+
+  }
+
+  list.innerHTML = data.map(member => `
+
+    <div class="card">
+
+      <div class="schedule-row">
+
+        <div class="day">
+          ${member.role === "manager" ? "👑" : "👤"}
+        </div>
+
+        <div class="schedule-info">
+
+          <strong>
+            ${member.full_name}
+          </strong>
+
+          <span>
+            ${member.role === "manager"
+              ? "Manager"
+              : "Employee"}
+          </span>
+
+        </div>
+
+        <div class="pill">
+          ${member.role}
+        </div>
+
+      </div>
+
+    </div>
+
+  `).join("");
+
+}
+
+
+document.getElementById("saveTeamMember")
+  .addEventListener("click", async function () {
+
+    const name =
+      document.getElementById("newTeamName")
+        .value
+        .trim();
+
+    const role =
+      document.getElementById("newTeamRole")
+        .value;
+
+    const message =
+      document.getElementById("teamFormMessage");
+
+    message.textContent = "";
+
+    if (!name) {
+
+      message.textContent =
+        "Please enter a name.";
+
+      return;
+
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("team_members")
+        .insert({
+          full_name: name,
+          role: role
+        });
+
+    if (error) {
+
+      message.textContent =
+        error.message;
+
+      return;
+
+    }
+
+    message.style.color =
+      "#6d9b7c";
+
+    message.textContent =
+      name +
+      " was added successfully! 🫧";
+
+    document.getElementById("newTeamName")
+      .value = "";
+
+    await loadTeam();
+
+  });
 
 </script>
 
