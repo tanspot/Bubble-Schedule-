@@ -3281,7 +3281,470 @@ supabaseClient
   );
 
 checkSession();
+/* ==============================
+   WEEKLY SCHEDULE
+============================== */
 
+const dayNames = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"
+];
+
+async function loadWeeklySchedule() {
+
+  const container =
+    document.getElementById("weeklyScheduleTable");
+
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="notice">
+      Loading your team's schedule... 🫧
+    </div>
+  `;
+
+  const {
+    data: employees,
+    error: employeeError
+  } =
+    await supabaseClient
+      .from("team_members")
+      .select("id, full_name, role, email, user_id")
+      .order("full_name");
+
+  if (employeeError) {
+
+    container.innerHTML = `
+      <div class="error">
+        ${escapeHtml(employeeError.message)}
+      </div>
+    `;
+
+    console.error(
+      "Team loading error:",
+      employeeError
+    );
+
+    return;
+  }
+
+  teamMembers = employees || [];
+
+  if (!teamMembers.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Add team members first 🫧
+      </div>
+    `;
+
+    return;
+  }
+
+  const {
+    data: schedule,
+    error: scheduleError
+  } =
+    await supabaseClient
+      .from("weekly_schedule")
+      .select("*")
+      .order("employee_id")
+      .order("day_of_week");
+
+  if (scheduleError) {
+
+    container.innerHTML = `
+      <div class="error">
+        ${escapeHtml(scheduleError.message)}
+      </div>
+    `;
+
+    console.error(
+      "Weekly schedule loading error:",
+      scheduleError
+    );
+
+    return;
+  }
+
+  renderWeeklySchedule(schedule || []);
+
+  renderCoworkerSchedule(schedule || []);
+}
+
+
+/* ==============================
+   RENDER WEEKLY SCHEDULE
+============================== */
+
+function renderWeeklySchedule(schedule) {
+
+  const container =
+    document.getElementById("weeklyScheduleTable");
+
+  if (!container) {
+    return;
+  }
+
+  let html = `
+    <table
+      style="
+        width:100%;
+        min-width:900px;
+        border-collapse:separate;
+        border-spacing:6px;
+      "
+    >
+
+      <thead>
+
+        <tr>
+
+          <th style="padding:10px;">
+            Employee
+          </th>
+  `;
+
+  dayNames.forEach(day => {
+
+    html += `
+      <th
+        style="
+          padding:10px;
+          color:#66586f;
+          font-size:13px;
+        "
+      >
+        ${day}
+      </th>
+    `;
+
+  });
+
+  html += `
+        </tr>
+
+      </thead>
+
+      <tbody>
+  `;
+
+  teamMembers.forEach(employee => {
+
+    html += `
+      <tr>
+
+        <td
+          style="
+            padding:10px;
+            background:#f1e6fa;
+            border-radius:14px;
+            font-weight:800;
+            white-space:nowrap;
+          "
+        >
+          ${escapeHtml(employee.full_name)}
+        </td>
+    `;
+
+    for (let day = 0; day < 7; day++) {
+
+      const existing =
+        schedule.find(item =>
+          item.employee_id === employee.id &&
+          Number(item.day_of_week) === day
+        );
+
+      const start =
+        existing?.start_time
+          ? existing.start_time.substring(0, 5)
+          : "";
+
+      const end =
+        existing?.end_time
+          ? existing.end_time.substring(0, 5)
+          : "";
+
+      const dayOff =
+        existing?.is_day_off || false;
+
+      html += `
+        <td
+          style="
+            background:#faf7fd;
+            border:1px solid #eadfec;
+            border-radius:15px;
+            padding:8px;
+            min-width:125px;
+          "
+        >
+
+          <input
+            type="time"
+            class="weekly-start"
+            data-employee="${employee.id}"
+            data-day="${day}"
+            value="${start}"
+            style="
+              width:100%;
+              padding:8px;
+              border:1px solid #eadfec;
+              border-radius:10px;
+              margin-bottom:5px;
+              box-sizing:border-box;
+            "
+          >
+
+          <input
+            type="time"
+            class="weekly-end"
+            data-employee="${employee.id}"
+            data-day="${day}"
+            value="${end}"
+            style="
+              width:100%;
+              padding:8px;
+              border:1px solid #eadfec;
+              border-radius:10px;
+              box-sizing:border-box;
+            "
+          >
+
+          <label
+            style="
+              display:flex;
+              align-items:center;
+              gap:5px;
+              font-size:12px;
+              margin-top:7px;
+            "
+          >
+
+            <input
+              type="checkbox"
+              class="weekly-off"
+              data-employee="${employee.id}"
+              data-day="${day}"
+              ${dayOff ? "checked" : ""}
+            >
+
+            OFF
+
+          </label>
+
+        </td>
+      `;
+    }
+
+    html += `
+      </tr>
+    `;
+
+  });
+
+  html += `
+      </tbody>
+
+    </table>
+  `;
+
+  container.innerHTML = html;
+}
+
+
+/* ==============================
+   SAVE WEEKLY SCHEDULE
+============================== */
+
+async function saveWeeklyScheduleData() {
+
+  const message =
+    document.getElementById("weeklyScheduleMessage");
+
+  message.textContent = "";
+
+  if (!teamMembers.length) {
+
+    message.textContent =
+      "Add employees first.";
+
+    return;
+  }
+
+  const records = [];
+
+  teamMembers.forEach(employee => {
+
+    for (let day = 0; day < 7; day++) {
+
+      const startInput =
+        document.querySelector(
+          `.weekly-start[data-employee="${employee.id}"][data-day="${day}"]`
+        );
+
+      const endInput =
+        document.querySelector(
+          `.weekly-end[data-employee="${employee.id}"][data-day="${day}"]`
+        );
+
+      const offInput =
+        document.querySelector(
+          `.weekly-off[data-employee="${employee.id}"][data-day="${day}"]`
+        );
+
+      if (!startInput || !endInput || !offInput) {
+        continue;
+      }
+
+      const isDayOff =
+        offInput.checked;
+
+      records.push({
+        employee_id: employee.id,
+        day_of_week: day,
+        start_time:
+          isDayOff
+            ? null
+            : (startInput.value || null),
+        end_time:
+          isDayOff
+            ? null
+            : (endInput.value || null),
+        is_day_off:
+          isDayOff
+      });
+
+    }
+
+  });
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("weekly_schedule")
+      .upsert(
+        records,
+        {
+          onConflict:
+            "employee_id,day_of_week"
+        }
+      );
+
+  if (error) {
+
+    message.textContent =
+      error.message;
+
+    console.error(
+      "Weekly schedule save error:",
+      error
+    );
+
+    return;
+  }
+
+  message.textContent =
+    "Weekly schedule saved successfully! 🫧";
+
+  await loadWeeklySchedule();
+}
+
+
+/* ==============================
+   COWORKER SCHEDULE
+============================== */
+
+function renderCoworkerSchedule(schedule) {
+
+  const container =
+    document.getElementById("coworkerSchedule");
+
+  if (!container) {
+    return;
+  }
+
+  const today =
+    new Date().getDay();
+
+  const workingToday =
+    schedule.filter(item =>
+      Number(item.day_of_week) === today &&
+      !item.is_day_off &&
+      item.start_time &&
+      item.end_time
+    );
+
+  if (!workingToday.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        No coworker schedule has been set yet 🫧
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    workingToday
+      .map(item => {
+
+        const employee =
+          teamMembers.find(
+            member =>
+              member.id === item.employee_id
+          );
+
+        if (!employee) {
+          return "";
+        }
+
+        return `
+          <div
+            style="
+              padding:12px;
+              margin-bottom:8px;
+              background:#faf7fd;
+              border:1px solid #eadfec;
+              border-radius:14px;
+            "
+          >
+            <strong>
+              ${escapeHtml(employee.full_name)}
+            </strong>
+
+            <div class="muted">
+              ${item.start_time.substring(0,5)}
+              –
+              ${item.end_time.substring(0,5)}
+            </div>
+
+          </div>
+        `;
+
+      })
+      .join("");
+}
+
+
+/* ==============================
+   WEEKLY SCHEDULE BUTTON
+============================== */
+
+document
+  .getElementById("saveWeeklySchedule")
+  ?.addEventListener(
+    "click",
+    saveWeeklyScheduleData
+  );
 </script>
 
 </body>
