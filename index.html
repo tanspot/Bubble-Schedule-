@@ -3854,6 +3854,128 @@ document
     "click",
     saveWeeklyScheduleData
   );
+  /* ==============================
+   TIME OFF REQUESTS
+============================== */
+
+async function submitTimeOffRequest() {
+
+  const startDate =
+    document.getElementById("timeOffStart").value;
+
+  const endDate =
+    document.getElementById("timeOffEnd").value;
+
+  const reason =
+    document
+      .getElementById("timeOffReason")
+      .value
+      .trim();
+
+  const message =
+    document.getElementById("timeOffMessage");
+
+  message.textContent = "";
+
+  if (!startDate || !endDate) {
+
+    message.textContent =
+      "Please choose a start and end date.";
+
+    return;
+  }
+
+  if (endDate < startDate) {
+
+    message.textContent =
+      "The end date cannot be before the start date.";
+
+    return;
+  }
+
+  if (!currentUser) {
+
+    message.textContent =
+      "You must be logged in to request time off.";
+
+    return;
+  }
+
+  try {
+
+    const {
+      data: employee,
+      error: employeeError
+    } =
+      await supabaseClient
+        .from("team_members")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .single();
+
+    if (employeeError || !employee) {
+
+      message.textContent =
+        "Your employee account could not be found.";
+
+      console.error(
+        "Employee lookup error:",
+        employeeError
+      );
+
+      return;
+    }
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("time_off_requests")
+        .insert({
+          employee_id: employee.id,
+          start_date: startDate,
+          end_date: endDate,
+          reason: reason || null
+        });
+
+    if (error) {
+      throw error;
+    }
+
+    message.textContent =
+      "Time-off request submitted! 🫧";
+
+    document.getElementById("timeOffStart").value = "";
+    document.getElementById("timeOffEnd").value = "";
+    document.getElementById("timeOffReason").value = "";
+
+    if (
+      typeof loadTimeOffRequests === "function"
+    ) {
+      await loadTimeOffRequests();
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Time-off request error:",
+      error
+    );
+
+    message.textContent =
+      error.message;
+
+  }
+
+}
+
+
+document
+  .getElementById("submitTimeOff")
+  ?.addEventListener(
+    "click",
+    submitTimeOffRequest
+  );
 </script>
 
 </body>
