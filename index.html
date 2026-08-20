@@ -2100,6 +2100,46 @@ function showView(viewName) {
       );
     });
 
+  if (viewName === "home") {
+    loadHome();
+  }
+
+  if (viewName === "team") {
+    loadTeam();
+  }
+
+  if (viewName === "schedule") {
+    loadShifts();
+  }
+
+  if (viewName === "weeklySchedule") {
+
+    loadTeam().then(() => {
+      loadWeeklySchedule();
+    });
+
+  }
+
+  if (viewName === "timeOff") {
+
+    loadTimeOffRequests();
+
+  }
+
+  if (viewName === "checklists") {
+    loadChecklists();
+  }
+
+}
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.view === viewName
+      );
+    });
+
   if (viewName === "team") {
     loadTeam();
   }
