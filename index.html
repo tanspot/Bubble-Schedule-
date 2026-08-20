@@ -2246,17 +2246,19 @@ function showView(viewName) {
     });
   }
 
- if (viewName === "timeOff") {
+if (viewName === "timeOff") {
 
-  await loadTeam();
+  loadTeam().then(function() {
 
-  populateTimeOffEmployees();
+    populateTimeOffEmployees();
 
-  if (
-    typeof loadTimeOffRequests === "function"
-  ) {
-    loadTimeOffRequests();
-  }
+    if (
+      typeof loadTimeOffRequests === "function"
+    ) {
+      loadTimeOffRequests();
+    }
+
+  });
 
 }
 
