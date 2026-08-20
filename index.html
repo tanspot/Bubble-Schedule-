@@ -1,490 +1,840 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bubble Schedule</title>
 
-  <title>Bubble Schedule</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
 
-  <style>
+* {
+  box-sizing: border-box;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #40384a;
+  min-height: 100vh;
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, #ffd9ec, transparent 35%),
-        radial-gradient(circle at bottom right, #ccecff, transparent 35%),
-        linear-gradient(135deg, #f9f1ff, #eaf8ff);
-      color: #40384a;
-      min-height: 100vh;
-    }
+  background:
+    radial-gradient(circle at 8% 8%, #ffd9ec, transparent 30%),
+    radial-gradient(circle at 92% 90%, #ccecff, transparent 32%),
+    linear-gradient(135deg, #faf2ff, #edfaff);
+}
 
-    button,
-    input,
-    select {
-      font: inherit;
-    }
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
 
-    button {
-      cursor: pointer;
-    }
+button {
+  cursor: pointer;
+}
 
-    .screen {
-      min-height: 100vh;
-    }
+.hidden {
+  display: none !important;
+}
 
-    /* LOGIN */
 
-    #loginScreen {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
-    }
+/* LOGIN */
 
-    .login-card {
-      width: 100%;
-      max-width: 420px;
-      padding: 35px 25px;
-      background: rgba(255,255,255,.85);
-      backdrop-filter: blur(15px);
-      border-radius: 30px;
-      box-shadow: 0 20px 50px rgba(100,80,120,.15);
-      text-align: center;
-    }
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
 
-    .bubble-logo {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 30% 25%, white, transparent 20%),
-        linear-gradient(145deg,#ffd3e8,#d8cff9,#c7edff);
-      box-shadow:
-        0 10px 30px rgba(150,120,180,.2),
-        inset -10px -10px 20px rgba(255,255,255,.4);
-      display: grid;
-      place-items: center;
-      font-size: 40px;
-    }
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  padding: 35px 26px;
+  text-align: center;
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 32px;
-      color: #5a4b68;
-    }
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(15px);
 
-    .subtitle {
-      color: #8d8297;
-      margin-bottom: 25px;
-    }
+  border-radius: 30px;
 
-    .input-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
+  box-shadow:
+    0 20px 50px rgba(100,80,120,.15);
+}
 
-    .input-group label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #66586f;
-    }
+.bubble-logo {
+  width: 90px;
+  height: 90px;
 
-    .input-group input,
-    .input-group select {
-      width: 100%;
-      border: 1px solid #eadfec;
-      background: white;
-      padding: 14px;
-      border-radius: 15px;
-      outline: none;
-    }
+  margin: 0 auto 20px;
 
-    .input-group input:focus,
-    .input-group select:focus {
-      border-color: #c9a7df;
-      box-shadow: 0 0 0 3px rgba(201,167,223,.15);
-    }
+  border-radius: 50%;
 
-    .primary-button {
-      width: 100%;
-      border: 0;
-      padding: 15px;
-      border-radius: 17px;
-      background: linear-gradient(135deg,#e7a9c8,#aeb2e8,#8fd1eb);
-      color: white;
-      font-weight: 800;
-      box-shadow: 0 10px 25px rgba(150,120,180,.2);
-    }
+  display: grid;
+  place-items: center;
 
-    .primary-button:active {
-      transform: scale(.98);
-    }
+  font-size: 40px;
 
-    .error {
-      color: #b34c6f;
-      margin-top: 15px;
-      font-size: 14px;
-      min-height: 18px;
-    }
+  background:
+    radial-gradient(
+      circle at 30% 25%,
+      white,
+      transparent 20%
+    ),
+    linear-gradient(
+      145deg,
+      #ffd3e8,
+      #d8cff9,
+      #c7edff
+    );
 
-    /* APP */
+  box-shadow:
+    0 10px 30px rgba(150,120,180,.2),
+    inset -10px -10px 20px rgba(255,255,255,.4);
+}
 
-    #app {
-      display: none;
-      min-height: 100vh;
-      padding-bottom: 40px;
-    }
+h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: #5a4b68;
+}
 
-    .topbar {
-      padding: 22px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
+h2,
+h3 {
+  color: #55485f;
+}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+.subtitle {
+  color: #8d8297;
+  margin-bottom: 25px;
+}
 
-    .small-bubble {
-      width: 45px;
-      height: 45px;
-      border-radius: 16px;
-      background: linear-gradient(145deg,#ffd3e8,#d8cff9,#c7edff);
-      display: grid;
-      place-items: center;
-      font-size: 22px;
-    }
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
 
-    .brand strong {
-      display: block;
-      font-size: 18px;
-      color: #55485f;
-    }
+.input-group label {
+  display: block;
+  margin-bottom: 7px;
 
-    .brand span {
-      font-size: 12px;
-      color: #91879c;
-    }
+  font-size: 14px;
+  font-weight: 700;
 
-    .logout-button {
-      border: 0;
-      background: rgba(255,255,255,.75);
-      color: #7c6d85;
-      padding: 10px 14px;
-      border-radius: 13px;
-      font-weight: 700;
-    }
+  color: #66586f;
+}
 
-    .container {
-      width: calc(100% - 30px);
-      max-width: 900px;
-      margin: auto;
-    }
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
 
-    .hero {
-      padding: 25px;
-      border-radius: 28px;
-      background: rgba(255,255,255,.72);
-      box-shadow: 0 15px 40px rgba(100,80,120,.1);
-      margin-bottom: 20px;
-    }
+  border: 1px solid #eadfec;
 
-    .hero h2 {
-      margin: 0 0 7px;
-      font-size: 26px;
-      color: #51455d;
-    }
+  background: white;
 
-    .hero p {
-      margin: 0;
-      color: #91879c;
-    }
+  padding: 14px;
 
-    .role-pill {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 7px 11px;
-      border-radius: 20px;
-      background: #f0e5fa;
-      color: #806796;
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: capitalize;
-    }
+  border-radius: 15px;
 
-    .section-title {
-      margin: 25px 5px 12px;
-      color: #66586f;
-      font-size: 18px;
-    }
+  outline: none;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: 15px;
-    }
+.input-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
 
-    .card {
-      background: rgba(255,255,255,.82);
-      border-radius: 22px;
-      padding: 20px;
-      box-shadow: 0 12px 30px rgba(100,80,120,.08);
-    }
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color: #c9a7df;
 
-    .stat-number {
-      font-size: 30px;
-      font-weight: 900;
-      color: #63516e;
-    }
+  box-shadow:
+    0 0 0 3px rgba(201,167,223,.15);
+}
 
-    .stat-label {
-      color: #93889d;
-      font-size: 13px;
-      margin-top: 4px;
-    }
+.primary-button {
+  width: 100%;
 
-    .quick-button {
-      width: 100%;
-      border: 0;
-      background: linear-gradient(135deg,#fff,#f6edff);
-      border-radius: 20px;
-      padding: 20px;
-      text-align: left;
-      box-shadow: 0 10px 25px rgba(100,80,120,.07);
-    }
+  border: 0;
 
-    .quick-button strong {
-      display: block;
-      color: #5d4d68;
-      margin-bottom: 5px;
-    }
+  padding: 15px;
 
-    .quick-button span {
-      color: #93889d;
-      font-size: 13px;
-    }
+  border-radius: 17px;
 
-    /* TEAM */
+  background:
+    linear-gradient(
+      135deg,
+      #e7a9c8,
+      #aeb2e8,
+      #8fd1eb
+    );
 
-    #teamScreen {
-      display: none;
-      min-height: 100vh;
-      padding-bottom: 40px;
-    }
+  color: white;
 
-    .team-header {
-      padding: 22px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  font-weight: 800;
 
-    .back-button {
-      border: 0;
-      background: rgba(255,255,255,.8);
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      font-size: 20px;
-    }
+  box-shadow:
+    0 10px 25px rgba(150,120,180,.2);
+}
 
-    .team-header h2 {
-      margin: 0;
-      color: #55485f;
-    }
+.secondary-button {
+  border: 0;
 
-    .team-count {
-      color: #91879c;
-      font-size: 13px;
-      margin-top: 3px;
-    }
+  padding: 11px 15px;
 
-    .add-button {
-      width: 100%;
-      border: 0;
-      padding: 15px;
-      border-radius: 17px;
-      background: linear-gradient(135deg,#ffd2e7,#d7d1f8,#c6ebfa);
-      color: #5d5067;
-      font-weight: 800;
-      margin-bottom: 15px;
-    }
+  border-radius: 14px;
 
-    #addTeamForm {
-      display: none;
-      margin-bottom: 20px;
-    }
+  background: #f0e5fa;
 
-    .team-list {
-      display: grid;
-      gap: 14px;
-    }
+  color: #6d587b;
 
-    .schedule-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+  font-weight: 800;
+}
 
-    .schedule-info strong {
-      display: block;
-      color: #5d5067;
-      font-size: 17px;
-    }
+.danger-button {
+  border: 0;
 
-    .schedule-info span {
-      display: block;
-      margin-top: 4px;
-      color: #958a9e;
-      font-size: 13px;
-      text-transform: capitalize;
-    }
+  padding: 11px 15px;
 
-    #teamFormMessage {
-      margin-top: 10px;
-      font-size: 13px;
-      color: #b34c6f;
-      min-height: 18px;
-    }
+  border-radius: 14px;
 
-    @media (max-width: 500px) {
+  background: #f8dfe9;
 
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
+  color: #a45877;
 
-      .hero h2 {
-        font-size: 23px;
-      }
+  font-weight: 800;
+}
 
-    }
+.error {
+  color: #b34c6f;
 
-  </style>
+  margin-top: 10px;
 
+  font-size: 13px;
+
+  min-height: 18px;
+}
+
+
+/* APP */
+
+#app {
+  min-height: 100vh;
+
+  padding-bottom: 95px;
+}
+
+.topbar {
+  padding: 22px 20px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 15px;
+}
+
+.brand {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.small-bubble {
+  width: 45px;
+  height: 45px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffd3e8,
+      #d8cff9,
+      #c7edff
+    );
+
+  display: grid;
+
+  place-items: center;
+
+  font-size: 22px;
+}
+
+.brand strong {
+  display: block;
+
+  font-size: 18px;
+
+  color: #55485f;
+}
+
+.brand span {
+  font-size: 12px;
+
+  color: #91879c;
+}
+
+.logout-button {
+  border: 0;
+
+  background: rgba(255,255,255,.75);
+
+  color: #7c6d85;
+
+  padding: 10px 14px;
+
+  border-radius: 13px;
+
+  font-weight: 700;
+}
+
+.container {
+  width: calc(100% - 30px);
+
+  max-width: 900px;
+
+  margin: auto;
+}
+
+
+/* VIEWS */
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+
+/* HOME */
+
+.hero {
+  padding: 25px;
+
+  border-radius: 28px;
+
+  background: rgba(255,255,255,.72);
+
+  box-shadow:
+    0 15px 40px rgba(100,80,120,.1);
+
+  margin-bottom: 20px;
+}
+
+.hero h2 {
+  margin: 0 0 7px;
+
+  font-size: 26px;
+
+  color: #51455d;
+}
+
+.hero p {
+  margin: 0;
+
+  color: #91879c;
+}
+
+.role-pill {
+  display: inline-block;
+
+  margin-top: 12px;
+
+  padding: 7px 11px;
+
+  border-radius: 20px;
+
+  background: #f0e5fa;
+
+  color: #806796;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  text-transform: capitalize;
+}
+
+.section-title {
+  margin: 25px 5px 12px;
+
+  color: #66586f;
+
+  font-size: 18px;
+
+  font-weight: 800;
+}
+
+.grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2,1fr);
+
+  gap: 15px;
+}
+
+.card {
+  background:
+    rgba(255,255,255,.82);
+
+  border-radius: 22px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 12px 30px rgba(100,80,120,.08);
+}
+
+.stat-number {
+  font-size: 30px;
+
+  font-weight: 900;
+
+  color: #63516e;
+}
+
+.stat-label {
+  color: #93889d;
+
+  font-size: 13px;
+
+  margin-top: 4px;
+}
+
+.quick-button {
+  width: 100%;
+
+  border: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff,
+      #f6edff
+    );
+
+  border-radius: 20px;
+
+  padding: 20px;
+
+  text-align: left;
+
+  box-shadow:
+    0 10px 25px rgba(100,80,120,.07);
+}
+
+.quick-button strong {
+  display: block;
+
+  color: #5d4d68;
+
+  margin-bottom: 5px;
+}
+
+.quick-button span {
+  color: #93889d;
+
+  font-size: 13px;
+}
+
+
+/* PAGE HEADERS */
+
+.page-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 10px 0 18px;
+}
+
+.back-button {
+  border: 0;
+
+  background:
+    rgba(255,255,255,.8);
+
+  width: 42px;
+
+  height: 42px;
+
+  border-radius: 14px;
+
+  font-size: 20px;
+}
+
+
+/* TEAM */
+
+.team-list {
+  display: grid;
+
+  gap: 14px;
+}
+
+.team-member {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+}
+
+.member-avatar {
+  width: 54px;
+
+  height: 54px;
+
+  border-radius: 18px;
+
+  display: grid;
+
+  place-items: center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffd6e9,
+      #d8cff9,
+      #c6eafa
+    );
+
+  font-size: 25px;
+}
+
+.member-info strong {
+  display: block;
+
+  color: #5d5067;
+
+  font-size: 17px;
+}
+
+.member-info span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #958a9e;
+
+  font-size: 13px;
+
+  text-transform: capitalize;
+}
+
+.member-actions {
+  display: flex;
+
+  gap: 8px;
+
+  margin-top: 15px;
+}
+
+.member-actions button {
+  flex: 1;
+}
+
+.notice {
+  padding: 13px;
+
+  border-radius: 15px;
+
+  background: #f7effd;
+
+  color: #705d80;
+
+  font-size: 13px;
+
+  margin-bottom: 15px;
+}
+
+
+/* SCHEDULE */
+
+.shift-card {
+  margin-bottom: 14px;
+}
+
+.shift-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+.shift-date {
+  font-weight: 900;
+
+  color: #5d5067;
+}
+
+.shift-time {
+  color: #806796;
+
+  font-weight: 800;
+}
+
+.shift-employee {
+  margin-top: 6px;
+
+  color: #91879c;
+}
+
+.shift-notes {
+  margin-top: 9px;
+
+  color: #6f6377;
+}
+
+
+/* CHECKLIST */
+
+.checklist-card {
+  margin-bottom: 14px;
+}
+
+.checklist-title {
+  font-weight: 900;
+
+  color: #5d5067;
+}
+
+.checklist-description {
+  color: #91879c;
+
+  margin-top: 7px;
+}
+
+
+/* BOTTOM NAV */
+
+.bottom-nav {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 12px;
+
+  transform: translateX(-50%);
+
+  width: min(94%, 650px);
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap: 7px;
+
+  padding: 8px;
+
+  background:
+    rgba(255,255,255,.92);
+
+  backdrop-filter: blur(15px);
+
+  border-radius: 23px;
+
+  box-shadow:
+    0 12px 35px rgba(100,80,120,.18);
+
+  z-index: 20;
+}
+
+.nav-button {
+  border: 0;
+
+  background: transparent;
+
+  border-radius: 17px;
+
+  padding: 9px 5px;
+
+  color: #8b7c95;
+
+  font-weight: 800;
+
+  font-size: 12px;
+}
+
+.nav-button.active {
+  background: #f1e6fa;
+
+  color: #6d587b;
+}
+
+.nav-icon {
+  display: block;
+
+  font-size: 19px;
+
+  margin-bottom: 2px;
+}
+
+.empty {
+  text-align: center;
+
+  color: #91879c;
+
+  padding: 25px;
+}
+
+
+@media (max-width: 500px) {
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero h2 {
+    font-size: 23px;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
 
-  <!-- LOGIN SCREEN -->
 
-  <div id="loginScreen" class="screen">
+<!-- LOGIN -->
 
-    <div class="login-card">
+<div id="loginScreen">
 
-      <div class="bubble-logo">
+  <div class="login-card">
+
+    <div class="bubble-logo">
+      🫧
+    </div>
+
+    <h1>
+      Bubble Schedule
+    </h1>
+
+    <div class="subtitle">
+      Simple scheduling for your team
+    </div>
+
+    <form id="loginForm">
+
+      <div class="input-group">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          required
+        >
+
+      </div>
+
+
+      <div class="input-group">
+
+        <label>
+          Password
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Your password"
+          required
+        >
+
+      </div>
+
+
+      <button
+        class="primary-button"
+        type="submit"
+      >
+        Log In 🫧
+      </button>
+
+      <div
+        id="loginError"
+        class="error"
+      ></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<!-- APP -->
+
+<div id="app" class="hidden">
+
+
+  <div class="topbar">
+
+    <div class="brand">
+
+      <div class="small-bubble">
         🫧
       </div>
 
-      <h1>Bubble Schedule</h1>
+      <div>
 
-      <div class="subtitle">
-        Simple scheduling for your team
+        <strong>
+          Bubble Schedule
+        </strong>
+
+        <span>
+          Team scheduling
+        </span>
+
       </div>
 
-      <form id="loginForm">
-
-        <div class="input-group">
-
-          <label for="email">
-            Email
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            required
-          >
-
-        </div>
-
-        <div class="input-group">
-
-          <label for="password">
-            Password
-          </label>
-
-          <input
-            id="password"
-            type="password"
-            placeholder="Your password"
-            required
-          >
-
-        </div>
-
-        <button
-          class="primary-button"
-          type="submit"
-        >
-          Log In
-        </button>
-
-        <div
-          id="loginError"
-          class="error"
-        ></div>
-
-      </form>
-
     </div>
+
+
+    <button
+      id="logoutButton"
+      class="logout-button"
+    >
+      Log Out
+    </button>
 
   </div>
 
 
-  <!-- MAIN APP -->
-
-  <div id="app">
-
-    <div class="topbar">
-
-      <div class="brand">
-
-        <div class="small-bubble">
-          🫧
-        </div>
-
-        <div>
-
-          <strong>
-            Bubble Schedule
-          </strong>
-
-          <span>
-            Team scheduling
-          </span>
-
-        </div>
-
-      </div>
-
-      <button
-        id="logoutButton"
-        class="logout-button"
-        type="button"
-      >
-        Log Out
-      </button>
-
-    </div>
+  <main class="container">
 
 
-    <div class="container">
+    <!-- HOME -->
+
+    <section
+      id="homeView"
+      class="view active"
+    >
 
       <div class="hero">
 
@@ -499,8 +849,7 @@
         <div
           id="roleDisplay"
           class="role-pill"
-        >
-        </div>
+        ></div>
 
       </div>
 
@@ -509,13 +858,14 @@
         Overview
       </div>
 
+
       <div class="grid">
 
         <div class="card">
 
           <div
-            class="stat-number"
             id="teamStat"
+            class="stat-number"
           >
             0
           </div>
@@ -526,9 +876,11 @@
 
         </div>
 
+
         <div class="card">
 
           <div
+            id="todayStat"
             class="stat-number"
           >
             0
@@ -547,28 +899,12 @@
         Quick Actions
       </div>
 
+
       <div class="grid">
 
         <button
           class="quick-button"
-          type="button"
-          id="teamNavButton"
-        >
-
-          <strong>
-            👥 Manage Team
-          </strong>
-
-          <span>
-            Add or remove employees
-          </span>
-
-        </button>
-
-
-        <button
-          class="quick-button"
-          type="button"
+          data-view="schedule"
         >
 
           <strong>
@@ -576,69 +912,264 @@
           </strong>
 
           <span>
-            Build your team's schedule
+            View your team's schedule
+          </span>
+
+        </button>
+
+
+        <button
+          class="quick-button"
+          data-view="team"
+        >
+
+          <strong>
+            👥 Manage Team
+          </strong>
+
+          <span>
+            Add employees and send invitations
+          </span>
+
+        </button>
+
+
+        <button
+          class="quick-button"
+          data-view="notes"
+        >
+
+          <strong>
+            💌 Private Notes
+          </strong>
+
+          <span>
+            Private messages between team members
+          </span>
+
+        </button>
+
+
+        <button
+          class="quick-button"
+          data-view="checklists"
+        >
+
+          <strong>
+            ✅ Checklists
+          </strong>
+
+          <span>
+            Assign and track tasks
           </span>
 
         </button>
 
       </div>
 
-    </div>
-
-  </div>
+    </section>
 
 
-  <!-- TEAM SCREEN -->
 
-  <div id="teamScreen">
+    <!-- SCHEDULE -->
 
-    <div class="team-header">
+    <section
+      id="scheduleView"
+      class="view"
+    >
 
-      <button
-        id="teamBackButton"
-        class="back-button"
-        type="button"
-      >
-        ←
-      </button>
+      <div class="page-header">
 
-      <div>
-
-        <h2>
-          Your Team
-        </h2>
-
-        <div
-          id="teamCount"
-          class="team-count"
+        <button
+          class="back-button"
+          data-view="home"
         >
-          0 members
+          ←
+        </button>
+
+        <div>
+
+          <h2>
+            Schedule
+          </h2>
+
+          <div class="muted">
+            Your team's shifts
+          </div>
+
         </div>
 
       </div>
 
-    </div>
 
-
-    <div class="container">
-
-      <button
-        id="showAddTeam"
-        class="add-button"
-        type="button"
-      >
-        + Add Team Member
-      </button>
-
+      <!-- MANAGER ADD SHIFT -->
 
       <div
-        id="addTeamForm"
-        class="card"
+        id="managerShiftForm"
+        class="card hidden"
       >
+
+        <h3>
+          Add Shift
+        </h3>
+
 
         <div class="input-group">
 
-          <label for="newTeamName">
+          <label>
+            Employee
+          </label>
+
+          <select id="shiftEmployee"></select>
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label>
+            Date
+          </label>
+
+          <input
+            id="shiftDate"
+            type="date"
+          >
+
+        </div>
+
+
+        <div class="grid">
+
+          <div class="input-group">
+
+            <label>
+              Start
+            </label>
+
+            <input
+              id="shiftStart"
+              type="time"
+            >
+
+          </div>
+
+
+          <div class="input-group">
+
+            <label>
+              End
+            </label>
+
+            <input
+              id="shiftEnd"
+              type="time"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label>
+            Notes
+          </label>
+
+          <textarea
+            id="shiftNotes"
+            placeholder="Optional notes"
+          ></textarea>
+
+        </div>
+
+
+        <button
+          id="saveShift"
+          class="primary-button"
+        >
+          Add Shift
+        </button>
+
+
+        <div
+          id="shiftMessage"
+          class="error"
+        ></div>
+
+      </div>
+
+
+      <div class="section-title">
+        Upcoming Shifts
+      </div>
+
+
+      <div id="shiftList"></div>
+
+    </section>
+
+
+
+    <!-- TEAM -->
+
+    <section
+      id="teamView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>
+            Your Team
+          </h2>
+
+          <div
+            id="teamCount"
+            class="muted"
+          >
+            0 members
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MANAGER AREA -->
+
+      <div
+        id="managerTeamArea"
+        class="card hidden"
+      >
+
+        <h3>
+          Add Team Member
+        </h3>
+
+
+        <div class="notice">
+
+          Add the employee's name and email.
+          They will receive an invitation and create
+          their own password.
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label>
             Employee Name
           </label>
 
@@ -653,7 +1184,22 @@
 
         <div class="input-group">
 
-          <label for="newTeamRole">
+          <label>
+            Employee Email
+          </label>
+
+          <input
+            id="newTeamEmail"
+            type="email"
+            placeholder="employee@email.com"
+          >
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label>
             Role
           </label>
 
@@ -675,568 +1221,2175 @@
         <button
           id="saveTeamMember"
           class="primary-button"
-          type="button"
         >
-          Save Team Member
+          Add Employee 🫧
         </button>
 
-        <div id="teamFormMessage"></div>
 
+        <div
+          id="teamFormMessage"
+          class="error"
+        ></div>
+
+      </div>
+
+
+      <div class="section-title">
+        Team Members
       </div>
 
 
       <div
         id="teamList"
         class="team-list"
-      >
-        Loading your team...
+      ></div>
+
+    </section>
+
+
+
+    <!-- NOTES -->
+
+    <section
+      id="notesView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>
+            Private Notes
+          </h2>
+
+          <div class="muted">
+            Private team communication
+          </div>
+
+        </div>
+
       </div>
 
-    </div>
 
-  </div>
+      <div class="card">
+
+        <div class="notice">
+
+          Notes are designed so that only the
+          sender and recipient can see them.
+
+        </div>
 
 
-  <script>
+        <div
+          id="notesList"
+          class="empty"
+        >
+          No notes yet 🫧
+        </div>
 
-    /* SUPABASE CONNECTION */
+      </div>
 
-    const SUPABASE_URL =
-      "https://sflhmsbqlrgkcukwcewj.supabase.co";
+    </section>
 
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_7iv8DqjXT_CG5M3zf8NY8g_ZvRW6NQ8";
 
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
+
+    <!-- CHECKLISTS -->
+
+    <section
+      id="checklistsView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>
+            Checklists
+          </h2>
+
+          <div class="muted">
+            Tasks for your team
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="managerChecklistForm"
+        class="card hidden"
+      >
+
+        <h3>
+          Assign Checklist
+        </h3>
+
+
+        <div class="input-group">
+
+          <label>
+            Title
+          </label>
+
+          <input
+            id="checkTitle"
+            placeholder="Example: Closing checklist"
+          >
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label>
+            Description
+          </label>
+
+          <textarea
+            id="checkDescription"
+            placeholder="What needs to be done?"
+          ></textarea>
+
+        </div>
+
+
+        <div class="input-group">
+
+          <label>
+            Assign To
+          </label>
+
+          <select id="checkEmployee"></select>
+
+        </div>
+
+
+        <button
+          id="saveChecklist"
+          class="primary-button"
+        >
+          Assign Checklist
+        </button>
+
+
+        <div
+          id="checkMessage"
+          class="error"
+        ></div>
+
+      </div>
+
+
+      <div class="section-title">
+        My Checklists
+      </div>
+
+
+      <div id="checklistList"></div>
+
+    </section>
+
+
+
+    <!-- SETTINGS -->
+
+    <section
+      id="settingsView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>
+            Settings
+          </h2>
+
+          <div class="muted">
+            Your Bubble Schedule account
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3 id="settingsName">
+          Account
+        </h3>
+
+        <p
+          id="settingsEmail"
+          class="muted"
+        ></p>
+
+        <div
+          id="settingsRole"
+          class="role-pill"
+        ></div>
+
+
+        <br><br>
+
+
+        <button
+          id="settingsLogout"
+          class="danger-button"
+          style="width:100%;"
+        >
+          Log Out
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-button active"
+      data-view="home"
+    >
+      <span class="nav-icon">
+        🏠
+      </span>
+      Home
+    </button>
+
+
+    <button
+      class="nav-button"
+      data-view="schedule"
+    >
+      <span class="nav-icon">
+        📅
+      </span>
+      Schedule
+    </button>
+
+
+    <button
+      class="nav-button"
+      data-view="team"
+    >
+      <span class="nav-icon">
+        👥
+      </span>
+      Team
+    </button>
+
+
+    <button
+      class="nav-button"
+      data-view="settings"
+    >
+      <span class="nav-icon">
+        ⚙️
+      </span>
+      Settings
+    </button>
+
+  </nav>
+
+</div>
+
+
+
+<script>
+
+
+/* SUPABASE */
+
+const SUPABASE_URL =
+  "https://sflhmsbqlrgkcukwcewj.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_7iv8DqjXT_CG5M3zf8NY8g_ZvRW6NQ8";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* GLOBAL STATE */
+
+let currentUser = null;
+
+let currentProfile = null;
+
+let teamMembers = [];
+
+
+/* HELPER */
+
+function element(id) {
+  return document.getElementById(id);
+}
+
+
+function isManager() {
+
+  return (
+    currentProfile &&
+    (
+      currentProfile.role === "owner" ||
+      currentProfile.role === "manager"
+    )
+  );
+
+}
+
+
+/* NAVIGATION */
+
+function showView(viewName) {
+
+  document
+    .querySelectorAll(".view")
+    .forEach(view => {
+
+      view.classList.remove("active");
+
+    });
+
+
+  const view =
+    element(viewName + "View");
+
+
+  if (view) {
+
+    view.classList.add("active");
+
+  }
+
+
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.view === viewName
       );
 
-
-    /* SCREEN ELEMENTS */
-
-    const loginScreen =
-      document.getElementById("loginScreen");
-
-    const app =
-      document.getElementById("app");
-
-    const loginForm =
-      document.getElementById("loginForm");
-
-    const loginError =
-      document.getElementById("loginError");
+    });
 
 
-    /* LOGIN */
+  if (viewName === "team") {
 
-    loginForm.addEventListener(
-      "submit",
-      async function(event) {
+    loadTeam();
 
-        event.preventDefault();
-
-        loginError.textContent = "";
-
-        const email =
-          document
-            .getElementById("email")
-            .value
-            .trim();
-
-        const password =
-          document
-            .getElementById("password")
-            .value;
+  }
 
 
-        const { data, error } =
-          await supabaseClient.auth.signInWithPassword({
+  if (viewName === "schedule") {
+
+    loadShifts();
+
+  }
+
+
+  if (viewName === "checklists") {
+
+    loadChecklists();
+
+  }
+
+}
+
+
+document
+  .querySelectorAll("[data-view]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      function() {
+
+        showView(
+          this.dataset.view
+        );
+
+      }
+    );
+
+  });
+
+
+/* SHOW APP */
+
+async function showApp(user) {
+
+  currentUser = user;
+
+
+  element("loginScreen")
+    .style.display = "none";
+
+
+  element("app")
+    .classList.remove("hidden");
+
+
+  const {
+    data: profile,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id, full_name, role"
+      )
+      .eq(
+        "id",
+        user.id
+      )
+      .single();
+
+
+  if (error || !profile) {
+
+    console.error(
+      "PROFILE ERROR:",
+      error
+    );
+
+    element("welcome").textContent =
+      "Welcome!";
+
+    return;
+
+  }
+
+
+  currentProfile =
+    profile;
+
+
+  element("welcome")
+    .textContent =
+      profile.full_name
+        ? "Welcome, " +
+          profile.full_name +
+          "!"
+        : "Welcome!";
+
+
+  element("roleDisplay")
+    .textContent =
+      profile.role || "";
+
+
+  element("settingsName")
+    .textContent =
+      profile.full_name ||
+      "Account";
+
+
+  element("settingsEmail")
+    .textContent =
+      user.email || "";
+
+
+  element("settingsRole")
+    .textContent =
+      profile.role || "";
+
+
+  if (isManager()) {
+
+    element("managerTeamArea")
+      .classList.remove("hidden");
+
+    element("managerShiftForm")
+      .classList.remove("hidden");
+
+    element("managerChecklistForm")
+      .classList.remove("hidden");
+
+  } else {
+
+    element("managerTeamArea")
+      .classList.add("hidden");
+
+    element("managerShiftForm")
+      .classList.add("hidden");
+
+    element("managerChecklistForm")
+      .classList.add("hidden");
+
+  }
+
+
+  await loadTeam();
+
+  await loadShifts();
+
+  await loadChecklists();
+
+}
+
+
+/* LOGIN */
+
+element("loginForm")
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      element("loginError")
+        .textContent = "";
+
+
+      const email =
+        element("email")
+          .value
+          .trim();
+
+
+      const password =
+        element("password")
+          .value;
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .auth
+          .signInWithPassword({
+
             email: email,
+
             password: password
+
           });
 
 
-        if (error) {
-
-          alert(
-            "LOGIN ERROR: " +
-            error.message
-          );
-
-          loginError.textContent =
-            error.message;
-
-          return;
-
-        }
-
-
-        alert("LOGIN SUCCESS!");
-
-
-        await showApp(data.user);
-
-      });
-
-
-    /* SHOW APP */
-
-    async function showApp(user) {
-
-      loginScreen.style.display =
-        "none";
-
-      app.style.display =
-        "block";
-
-
-      const { data: profile, error } =
-        await supabaseClient
-          .from("profiles")
-          .select("full_name, role")
-          .eq("id", user.id)
-          .single();
-
-
       if (error) {
 
-        console.error(
-          "PROFILE ERROR:",
-          error
-        );
-
-        document.getElementById("welcome").textContent =
-          "Welcome!";
-
-        document.getElementById("roleDisplay").textContent =
-          "";
+        element("loginError")
+          .textContent =
+          error.message;
 
         return;
 
       }
 
 
-      if (profile) {
-
-        document.getElementById("welcome").textContent =
-          profile.full_name
-            ? "Welcome, " +
-              profile.full_name +
-              "!"
-            : "Welcome!";
-
-
-        document.getElementById("roleDisplay").textContent =
-          profile.role || "";
-
-      }
+      await showApp(
+        data.user
+      );
 
     }
+  );
 
 
-    /* LOGOUT */
+/* LOGOUT */
 
-    document
-      .getElementById("logoutButton")
-      .addEventListener(
-        "click",
-        async function() {
+async function logout() {
 
-          await supabaseClient.auth.signOut();
+  await supabaseClient
+    .auth
+    .signOut();
 
-          app.style.display =
-            "none";
 
-          loginScreen.style.display =
-            "flex";
+  currentUser = null;
 
-        }
+  currentProfile = null;
+
+
+  element("app")
+    .classList.add("hidden");
+
+
+  element("loginScreen")
+    .style.display = "flex";
+
+
+  element("loginForm")
+    .reset();
+
+
+  showView("home");
+
+}
+
+
+element("logoutButton")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+element("settingsLogout")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+/* LOAD TEAM */
+
+async function loadTeam() {
+
+  const list =
+    element("teamList");
+
+
+  list.innerHTML =
+    `
+      <div class="card empty">
+        Loading your team... 🫧
+      </div>
+    `;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("team_members")
+      .select(
+        "id, full_name, role, email, user_id"
+      )
+      .order(
+        "full_name"
       );
 
 
-    /* CHECK EXISTING SESSION */
+  if (error) {
 
-    async function checkSession() {
+    list.innerHTML =
+      `
+        <div class="card">
 
-      const { data } =
-        await supabaseClient.auth.getSession();
+          <strong>
+            Unable to load team members.
+          </strong>
 
-      if (data.session) {
+          <p class="muted">
+            ${escapeHtml(error.message)}
+          </p>
 
-        await showApp(
-          data.session.user
-        );
+        </div>
+      `;
 
-      }
+    return;
 
-    }
-
-    checkSession();
-
-
-    /* OPEN TEAM */
-
-    document
-      .getElementById("teamNavButton")
-      .addEventListener(
-        "click",
-        async function() {
-
-          app.style.display =
-            "none";
-
-          document
-            .getElementById("teamScreen")
-            .style.display =
-            "block";
-
-          await loadTeam();
-
-        }
-      );
+  }
 
 
-    /* BACK FROM TEAM */
-
-    document
-      .getElementById("teamBackButton")
-      .addEventListener(
-        "click",
-        function() {
-
-          document
-            .getElementById("teamScreen")
-            .style.display =
-            "none";
-
-          app.style.display =
-            "block";
-
-        }
-      );
+  teamMembers =
+    data || [];
 
 
-    /* SHOW ADD TEAM FORM */
-
-    document
-      .getElementById("showAddTeam")
-      .addEventListener(
-        "click",
-        function() {
-
-          const form =
-            document.getElementById(
-              "addTeamForm"
-            );
-
-          form.style.display =
-            form.style.display === "none"
-              ? "block"
-              : "none";
-
-        }
-      );
+  element("teamStat")
+    .textContent =
+    teamMembers.length;
 
 
-    /* LOAD TEAM */
-
-    async function loadTeam() {
-
-      const list =
-        document.getElementById(
-          "teamList"
-        );
-
-      list.innerHTML =
-        "Loading your team...";
+  element("teamCount")
+    .textContent =
+    teamMembers.length +
+    (
+      teamMembers.length === 1
+        ? " member"
+        : " members"
+    );
 
 
-      const { data, error } =
-        await supabaseClient
-          .from("team_members")
-          .select(
-            "id, full_name, role"
-          )
-          .order("full_name");
+  populateEmployeeSelects();
 
 
-      if (error) {
+  if (!teamMembers.length) {
 
-        console.error(
-          "TEAM ERROR:",
-          error
-        );
+    list.innerHTML =
+      `
+        <div class="card empty">
 
-        list.innerHTML = `
-          <div class="card">
-            <strong>
-              Unable to load team members.
-            </strong>
+          No team members yet 🫧
 
-            <p style="color:#91879c;">
-              ${error.message}
-            </p>
-          </div>
-        `;
+        </div>
+      `;
 
-        return;
+    return;
 
-      }
+  }
 
 
-      document.getElementById(
-        "teamCount"
-      ).textContent =
-        data.length +
-        (
-          data.length === 1
-            ? " member"
-            : " members"
-        );
+  list.innerHTML =
+    teamMembers
+      .map(
+        member => `
 
-
-      document.getElementById(
-        "teamStat"
-      ).textContent =
-        data.length;
-
-
-      if (!data.length) {
-
-        list.innerHTML = `
           <div class="card">
 
-            <strong>
-              No team members yet 🫧
-            </strong>
+            <div class="team-member">
 
-            <p style="color:#91879c;">
-              Add your first employee above.
-            </p>
+              <div class="member-avatar">
 
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      list.innerHTML =
-        data.map(
-          member => `
-
-            <div
-              class="card"
-              style="position:relative;"
-            >
-
-              <div class="schedule-row">
-
-                <div
-                  style="
-                    width:54px;
-                    height:54px;
-                    border-radius:18px;
-                    display:grid;
-                    place-items:center;
-                    background:
-                      linear-gradient(
-                        145deg,
-                        #ffd6e9,
-                        #d8cff9,
-                        #c6eafa
-                      );
-                    font-size:25px;
-                  "
-                >
-                  ${
-                    member.role === "manager"
-                      ? "👑"
-                      : "🫧"
-                  }
-                </div>
-
-
-                <div class="schedule-info">
-
-                  <strong>
-                    ${member.full_name}
-                  </strong>
-
-                  <span>
-                    ${member.role}
-                  </span>
-
-                </div>
+                ${
+                  member.role === "manager"
+                    ? "👑"
+                    : "🫧"
+                }
 
               </div>
 
 
-              <div
-                style="
-                  display:flex;
-                  gap:8px;
-                  margin-top:15px;
-                "
-              >
+              <div class="member-info">
 
-                <button
-                  type="button"
-                  onclick="
-                    removeTeamMember(
-                      '${member.id}'
-                    )
-                  "
-                  style="
-                    flex:1;
-                    border:0;
-                    padding:11px;
-                    border-radius:14px;
-                    background:#f8dfe9;
-                    color:#a45877;
-                    font-weight:700;
-                  "
-                >
-                  Remove
-                </button>
+                <strong>
+                  ${escapeHtml(
+                    member.full_name
+                  )}
+                </strong>
+
+                <span>
+
+                  ${escapeHtml(
+                    member.role
+                  )}
+
+                  ${
+                    member.email
+                      ? " · " +
+                        escapeHtml(
+                          member.email
+                        )
+                      : ""
+                  }
+
+                </span>
 
               </div>
 
             </div>
 
-          `
-        ).join("");
+
+            ${
+              isManager()
+                ? `
+
+                  <div class="member-actions">
+
+                    ${
+                      member.user_id
+
+                        ? `
+
+                          <button
+                            class="secondary-button"
+                            disabled
+                          >
+                            Account Linked ✓
+                          </button>
+
+                        `
+
+                        : `
+
+                          <button
+                            class="primary-button"
+                            type="button"
+                            onclick="
+                              inviteEmployee(
+                                '${member.id}'
+                              )
+                            "
+                          >
+                            Send Invitation
+                          </button>
+
+                        `
+                    }
+
+
+                    <button
+                      class="danger-button"
+                      type="button"
+                      onclick="
+                        removeTeamMember(
+                          '${member.id}'
+                        )
+                      "
+                    >
+                      Remove
+                    </button>
+
+                  </div>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        `
+      )
+      .join("");
+
+}
+
+
+/* EMPLOYEE SELECTS */
+
+function populateEmployeeSelects() {
+
+  const options =
+    teamMembers
+      .map(
+        member => `
+
+          <option value="${member.id}">
+            ${escapeHtml(
+              member.full_name
+            )}
+          </option>
+
+        `
+      )
+      .join("");
+
+
+  element("shiftEmployee")
+    .innerHTML =
+    options ||
+    `<option value="">
+      No employees
+    </option>`;
+
+
+  element("checkEmployee")
+    .innerHTML =
+    options ||
+    `<option value="">
+      No employees
+    </option>`;
+
+}
+
+
+/* ADD TEAM MEMBER */
+
+element("saveTeamMember")
+  .addEventListener(
+    "click",
+    async function() {
+
+      const name =
+        element("newTeamName")
+          .value
+          .trim();
+
+
+      const email =
+        element("newTeamEmail")
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const role =
+        element("newTeamRole")
+          .value;
+
+
+      const message =
+        element("teamFormMessage");
+
+
+      message.textContent =
+        "";
+
+
+      if (!name || !email) {
+
+        message.textContent =
+          "Please enter the employee's name and email.";
+
+        return;
+
+      }
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("team_members")
+          .insert({
+
+            full_name: name,
+
+            email: email,
+
+            role: role
+
+          })
+          .select("id")
+          .single();
+
+
+      if (error) {
+
+        message.textContent =
+          error.message;
+
+        return;
+
+      }
+
+
+      element("newTeamName")
+        .value = "";
+
+
+      element("newTeamEmail")
+        .value = "";
+
+
+      element("newTeamRole")
+        .value =
+        "employee";
+
+
+      await loadTeam();
+
+
+      const sendNow =
+        confirm(
+          name +
+          " was added.\n\n" +
+          "Would you like to send their account invitation now?"
+        );
+
+
+      if (sendNow) {
+
+        await inviteEmployee(
+          data.id
+        );
+
+      } else {
+
+        message.style.color =
+          "#6d9b7c";
+
+        message.textContent =
+          name +
+          " was added successfully! 🫧";
+
+      }
 
     }
+  );
 
 
-    /* ADD TEAM MEMBER */
+/* INVITE EMPLOYEE */
 
-    document
-      .getElementById("saveTeamMember")
-      .addEventListener(
-        "click",
-        async function() {
+async function inviteEmployee(
+  teamMemberId
+) {
 
-          const name =
-            document
-              .getElementById(
-                "newTeamName"
-              )
-              .value
-              .trim();
+  const member =
+    teamMembers.find(
+      item =>
+        item.id ===
+        teamMemberId
+    );
 
 
-          const role =
-            document
-              .getElementById(
-                "newTeamRole"
-              )
-              .value;
+  if (!member) {
+
+    alert(
+      "Employee could not be found."
+    );
+
+    return;
+
+  }
 
 
-          const message =
-            document.getElementById(
-              "teamFormMessage"
-            );
+  if (!member.email) {
+
+    alert(
+      "This employee needs an email address first."
+    );
+
+    return;
+
+  }
 
 
-          message.textContent =
-            "";
+  if (
+    !confirm(
+      "Send an account invitation to " +
+      member.full_name +
+      " at " +
+      member.email +
+      "?"
+    )
+  ) {
+
+    return;
+
+  }
 
 
-          if (!name) {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .functions
+      .invoke(
+        "super-endpoint",
+        {
 
-            message.textContent =
-              "Please enter a name.";
+          body: {
 
-            return;
+            email:
+              member.email,
+
+            team_member_id:
+              member.id
 
           }
-
-
-          const { error } =
-            await supabaseClient
-              .from("team_members")
-              .insert({
-                full_name: name,
-                role: role
-              });
-
-
-          if (error) {
-
-            message.textContent =
-              error.message;
-
-            return;
-
-          }
-
-
-          message.style.color =
-            "#6d9b7c";
-
-          message.textContent =
-            name +
-            " was added successfully! 🫧";
-
-
-          document
-            .getElementById(
-              "newTeamName"
-            )
-            .value = "";
-
-
-          await loadTeam();
 
         }
       );
 
 
-    /* REMOVE TEAM MEMBER */
+  if (error) {
 
-    async function removeTeamMember(id) {
+    alert(
+      "INVITATION ERROR:\n\n" +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  if (
+    data &&
+    data.error
+  ) {
+
+    alert(
+      "INVITATION ERROR:\n\n" +
+      data.error
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "Invitation sent! 🫧\n\n" +
+    member.full_name +
+    " will create their own password."
+  );
+
+
+  await loadTeam();
+
+}
+
+
+/* REMOVE TEAM MEMBER */
+
+async function removeTeamMember(
+  id
+) {
+
+  if (
+    !confirm(
+      "Remove this team member?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("team_members")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      "REMOVE ERROR:\n\n" +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadTeam();
+
+}
+
+
+/* LOAD SHIFTS */
+
+async function loadShifts() {
+
+  const list =
+    element("shiftList");
+
+
+  let query =
+    supabaseClient
+      .from("shifts")
+      .select(
+        `
+          id,
+          employee_id,
+          shift_date,
+          start_time,
+          end_time,
+          notes,
+          team_members(
+            full_name
+          )
+        `
+      )
+      .order(
+        "shift_date",
+        {
+          ascending: true
+        }
+      )
+      .order(
+        "start_time",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (
+    !isManager() &&
+    currentUser
+  ) {
+
+    const mine =
+      teamMembers.find(
+        member =>
+          member.user_id ===
+          currentUser.id
+      );
+
+
+    if (!mine) {
+
+      list.innerHTML =
+        `
+          <div class="card empty">
+
+            Your employee account
+            is not linked yet.
+
+          </div>
+        `;
+
+      element("todayStat")
+        .textContent =
+        "0";
+
+      return;
+
+    }
+
+
+    query =
+      query.eq(
+        "employee_id",
+        mine.id
+      );
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await query;
+
+
+  if (error) {
+
+    list.innerHTML =
+      `
+        <div class="card">
+
+          <strong>
+            Unable to load schedule.
+          </strong>
+
+          <p class="muted">
+            ${escapeHtml(
+              error.message
+            )}
+          </p>
+
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  const shifts =
+    data || [];
+
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(
+        0,
+        10
+      );
+
+
+  element("todayStat")
+    .textContent =
+    shifts.filter(
+      shift =>
+        shift.shift_date ===
+        today
+    ).length;
+
+
+  if (!shifts.length) {
+
+    list.innerHTML =
+      `
+        <div class="card empty">
+
+          No shifts scheduled yet 🫧
+
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    shifts
+      .map(
+        shift => `
+
+          <div class="card shift-card">
+
+            <div class="shift-top">
+
+              <div class="shift-date">
+
+                ${formatDate(
+                  shift.shift_date
+                )}
+
+              </div>
+
+
+              <div class="shift-time">
+
+                ${formatTime(
+                  shift.start_time
+                )}
+
+                ${
+                  shift.end_time
+                    ? " – " +
+                      formatTime(
+                        shift.end_time
+                      )
+                    : ""
+                }
+
+              </div>
+
+            </div>
+
+
+            <div class="shift-employee">
+
+              ${
+                escapeHtml(
+                  shift.team_members
+                    ?.full_name ||
+                  "Employee"
+                )
+              }
+
+            </div>
+
+
+            ${
+              shift.notes
+                ? `
+
+                  <div class="shift-notes">
+
+                    ${escapeHtml(
+                      shift.notes
+                    )}
+
+                  </div>
+
+                `
+                : ""
+            }
+
+
+            ${
+              isManager()
+                ? `
+
+                  <div class="member-actions">
+
+                    <button
+                      class="danger-button"
+                      onclick="
+                        deleteShift(
+                          '${shift.id}'
+                        )
+                      "
+                    >
+                      Delete Shift
+                    </button>
+
+                  </div>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        `
+      )
+      .join("");
+
+}
+
+
+/* ADD SHIFT */
+
+element("saveShift")
+  .addEventListener(
+    "click",
+    async function() {
+
+      const employee_id =
+        element("shiftEmployee")
+          .value;
+
+
+      const shift_date =
+        element("shiftDate")
+          .value;
+
+
+      const start_time =
+        element("shiftStart")
+          .value ||
+        null;
+
+
+      const end_time =
+        element("shiftEnd")
+          .value ||
+        null;
+
+
+      const notes =
+        element("shiftNotes")
+          .value
+          .trim() ||
+        null;
+
+
+      const message =
+        element("shiftMessage");
+
+
+      message.textContent =
+        "";
+
 
       if (
-        !confirm(
-          "Remove this team member?"
-        )
+        !employee_id ||
+        !shift_date
       ) {
+
+        message.textContent =
+          "Choose an employee and date.";
 
         return;
 
       }
 
 
-      const { error } =
+      const {
+        error
+      } =
         await supabaseClient
-          .from("team_members")
-          .delete()
-          .eq("id", id);
+          .from("shifts")
+          .insert({
+
+            employee_id,
+
+            shift_date,
+
+            start_time,
+
+            end_time,
+
+            notes
+
+          });
 
 
       if (error) {
 
-        alert(
-          "REMOVE ERROR: " +
-          error.message
-        );
+        message.textContent =
+          error.message;
 
         return;
 
       }
 
 
-      await loadTeam();
+      message.style.color =
+        "#6d9b7c";
+
+
+      message.textContent =
+        "Shift added! 🫧";
+
+
+      element("shiftDate")
+        .value = "";
+
+
+      element("shiftStart")
+        .value = "";
+
+
+      element("shiftEnd")
+        .value = "";
+
+
+      element("shiftNotes")
+        .value = "";
+
+
+      await loadShifts();
+
+    }
+  );
+
+
+/* DELETE SHIFT */
+
+async function deleteShift(
+  id
+) {
+
+  if (
+    !confirm(
+      "Delete this shift?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("shifts")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadShifts();
+
+}
+
+
+/* CHECKLISTS */
+
+async function loadChecklists() {
+
+  const list =
+    element(
+      "checklistList"
+    );
+
+
+  let query =
+    supabaseClient
+      .from("checklists")
+      .select(
+        `
+          id,
+          title,
+          description,
+          assigned_employee_id,
+          completed,
+          created_at,
+          completed_at,
+          team_members(
+            full_name
+          )
+        `
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if (
+    !isManager() &&
+    currentUser
+  ) {
+
+    const mine =
+      teamMembers.find(
+        member =>
+          member.user_id ===
+          currentUser.id
+      );
+
+
+    if (!mine) {
+
+      list.innerHTML =
+        `
+          <div class="card empty">
+
+            Your employee account
+            is not linked yet.
+
+          </div>
+        `;
+
+      return;
 
     }
 
-  </script>
+
+    query =
+      query.eq(
+        "assigned_employee_id",
+        mine.id
+      );
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await query;
+
+
+  if (error) {
+
+    list.innerHTML =
+      `
+        <div class="card">
+
+          <strong>
+            Unable to load checklists.
+          </strong>
+
+          <p class="muted">
+            ${escapeHtml(
+              error.message
+            )}
+          </p>
+
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  const checklists =
+    data || [];
+
+
+  if (!checklists.length) {
+
+    list.innerHTML =
+      `
+        <div class="card empty">
+
+          No checklists yet 🫧
+
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    checklists
+      .map(
+        item => `
+
+          <div class="card checklist-card">
+
+            <div class="team-member">
+
+              <div class="member-avatar">
+
+                ${
+                  item.completed
+                    ? "✓"
+                    : "✅"
+                }
+
+              </div>
+
+
+              <div>
+
+                <div
+                  class="checklist-title"
+                  style="
+                    ${
+                      item.completed
+                        ? "text-decoration:line-through;opacity:.6;"
+                        : ""
+                    }
+                  "
+                >
+
+                  ${escapeHtml(
+                    item.title
+                  )}
+
+                </div>
+
+
+                <div class="muted">
+
+                  Assigned to:
+                  ${
+                    escapeHtml(
+                      item.team_members
+                        ?.full_name ||
+                      "Employee"
+                    )
+                  }
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            ${
+              item.description
+                ? `
+
+                  <div class="checklist-description">
+
+                    ${escapeHtml(
+                      item.description
+                    )}
+
+                  </div>
+
+                `
+                : ""
+            }
+
+
+            <div class="member-actions">
+
+              ${
+                !item.completed
+
+                  ? `
+
+                    <button
+                      class="primary-button"
+                      onclick="
+                        completeChecklist(
+                          '${item.id}'
+                        )
+                      "
+                    >
+                      Mark Complete
+                    </button>
+
+                  `
+
+                  : `
+
+                    <button
+                      class="secondary-button"
+                      disabled
+                    >
+                      Completed ✓
+                    </button>
+
+                  `
+              }
+
+
+              ${
+                isManager()
+                  ? `
+
+                    <button
+                      class="danger-button"
+                      onclick="
+                        deleteChecklist(
+                          '${item.id}'
+                        )
+                      "
+                    >
+                      Delete
+                    </button>
+
+                  `
+                  : ""
+              }
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+}
+
+
+/* ADD CHECKLIST */
+
+element("saveChecklist")
+  .addEventListener(
+    "click",
+    async function() {
+
+      const title =
+        element("checkTitle")
+          .value
+          .trim();
+
+
+      const description =
+        element("checkDescription")
+          .value
+          .trim() ||
+        null;
+
+
+      const assigned_employee_id =
+        element("checkEmployee")
+          .value;
+
+
+      const message =
+        element("checkMessage");
+
+
+      message.textContent =
+        "";
+
+
+      if (
+        !title ||
+        !assigned_employee_id
+      ) {
+
+        message.textContent =
+          "Enter a title and choose an employee.";
+
+        return;
+
+      }
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("checklists")
+          .insert({
+
+            title,
+
+            description,
+
+            assigned_employee_id,
+
+            assigned_by:
+              currentUser.id
+
+          });
+
+
+      if (error) {
+
+        message.textContent =
+          error.message;
+
+        return;
+
+      }
+
+
+      message.style.color =
+        "#6d9b7c";
+
+
+      message.textContent =
+        "Checklist assigned! 🫧";
+
+
+      element("checkTitle")
+        .value = "";
+
+
+      element("checkDescription")
+        .value = "";
+
+
+      await loadChecklists();
+
+    }
+  );
+
+
+/* COMPLETE CHECKLIST */
+
+async function completeChecklist(
+  id
+) {
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("checklists")
+      .update({
+
+        completed:
+          true,
+
+        completed_at:
+          new Date()
+            .toISOString()
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadChecklists();
+
+}
+
+
+/* DELETE CHECKLIST */
+
+async function deleteChecklist(
+  id
+) {
+
+  if (
+    !confirm(
+      "Delete this checklist?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("checklists")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadChecklists();
+
+}
+
+
+/* DATE */
+
+function formatDate(
+  value
+) {
+
+  if (!value) {
+    return "";
+  }
+
+
+  return new Date(
+    value + "T00:00:00"
+  )
+    .toLocaleDateString(
+      undefined,
+      {
+        weekday:"short",
+        month:"short",
+        day:"numeric"
+      }
+    );
+
+}
+
+
+/* TIME */
+
+function formatTime(
+  value
+) {
+
+  if (!value) {
+    return "—";
+  }
+
+
+  const parts =
+    value.split(":");
+
+
+  const date =
+    new Date();
+
+
+  date.setHours(
+    Number(parts[0]),
+    Number(parts[1]),
+    0,
+    0
+  );
+
+
+  return date.toLocaleTimeString(
+    [],
+    {
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+
+/* SECURITY */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    character => ({
+
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+
+    }[character])
+  );
+
+}
+
+
+/* SESSION */
+
+async function checkSession() {
+
+  const {
+    data
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  if (
+    data.session
+  ) {
+
+    await showApp(
+      data.session.user
+    );
+
+  }
+
+}
+
+
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    async function(
+      event,
+      session
+    ) {
+
+      if (
+        session &&
+        !currentUser
+      ) {
+
+        await showApp(
+          session.user
+        );
+
+      }
+
+    }
+  );
+
+
+checkSession();
+
+</script>
 
 </body>
 </html>
