@@ -1419,6 +1419,20 @@ element("saveWeeklySchedule")
 
     <div class="input-group">
 
+      <label>Employee</label>
+
+      <select id="timeOffEmployee">
+
+        <option value="">
+          Select employee
+        </option>
+
+      </select>
+
+    </div>
+
+    <div class="input-group">
+
       <label>Start Date</label>
 
       <input
@@ -1447,6 +1461,27 @@ element("saveWeeklySchedule")
         id="timeOffReason"
         placeholder="Optional"
       ></textarea>
+
+    </div>
+
+    <div class="input-group">
+
+      <label>Need a shift switch?</label>
+
+      <select id="timeOffSwitchEmployee">
+
+        <option value="">
+          No — I don't need a switch
+        </option>
+
+      </select>
+
+      <div
+        class="muted"
+        style="margin-top:6px;"
+      >
+        Choose a coworker if you'd like to ask them to cover your shift.
+      </div>
 
     </div>
 
