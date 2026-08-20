@@ -1585,11 +1585,11 @@ element("saveWeeklySchedule")
 >
   📅 Set Weekly Schedule
 </button>
-      <button
+   <button
   type="button"
   class="primary-button"
   style="margin-bottom:18px;"
-  onclick="showView('timeOff')"
+  onclick="document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('timeOffView').classList.add('active');"
 >
   🏖️ Request Time Off
 </button>
