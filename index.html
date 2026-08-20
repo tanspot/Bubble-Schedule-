@@ -2732,30 +2732,21 @@ element("saveShift")
       message.textContent = "";
 
       if (!employee_id || !shift_date) {
-
         message.textContent =
           "Choose an employee and date.";
-
         return;
       }
-
-      /*
-       * Make sure the selected employee
-       * actually exists in team_members.
-       */
 
       const {
         data: employee,
         error: employeeError
-      } =
-        await supabaseClient
-          .from("team_members")
-          .select("id, full_name")
-          .eq("id", employee_id)
-          .single();
+      } = await supabaseClient
+        .from("team_members")
+        .select("id, full_name")
+        .eq("id", employee_id)
+        .single();
 
       if (employeeError || !employee) {
-
         message.textContent =
           "That employee could not be found. Please refresh the Team list and try again.";
 
@@ -2767,26 +2758,19 @@ element("saveShift")
         return;
       }
 
-      /*
-       * Now save the shift using the verified
-       * team_members ID.
-       */
-
       const {
         error
-      } =
-        await supabaseClient
-          .from("shifts")
-          .insert({
-            employee_id: employee.id,
-            shift_date,
-            start_time,
-            end_time,
-            notes
-          });
+      } = await supabaseClient
+        .from("shifts")
+        .insert({
+          employee_id: employee.id,
+          shift_date,
+          start_time,
+          end_time,
+          notes
+        });
 
       if (error) {
-
         message.textContent =
           error.message;
 
@@ -2800,25 +2784,6 @@ element("saveShift")
 
       message.textContent =
         "Shift added successfully! 🫧";
-
-      element("shiftDate").value = "";
-      element("shiftStart").value = "";
-      element("shiftEnd").value = "";
-      element("shiftNotes").value = "";
-
-      await loadShifts();
-
-    }
-  );
-
-        message.textContent =
-          error.message;
-
-        return;
-      }
-
-      message.style.color = "#6d9b7c";
-      message.textContent = "Shift added! 🫧";
 
       element("shiftDate").value = "";
       element("shiftStart").value = "";
