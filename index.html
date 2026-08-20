@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BubbleSchedule</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #eefaff;
+      color: #163b4d;
+    }
+
+    header {
+      background: white;
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #d9eef5;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1596bd;
+    }
+
+    .bubble {
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 18px 50px;
+    }
+
+    .welcome {
+      margin-bottom: 22px;
+    }
+
+    .welcome h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .welcome p {
+      color: #6d8792;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 25px;
+    }
+
+    .stat {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 5px 20px rgba(30, 130, 160, .08);
+    }
+
+    .stat-number {
+      font-size: 27px;
+      font-weight: 800;
+      color: #1596bd;
+    }
+
+    .stat-label {
+      color: #78919b;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(30, 130, 160, .08);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 17px;
+      gap: 10px;
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      background: #1596bd;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .schedule {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    th {
+      text-align: left;
+      font-size: 13px;
+      color: #78919b;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e6f1f4;
+    }
+
+    td {
+      padding: 14px 10px;
+      border-bottom: 1px solid #eef4f6;
+      font-size: 14px;
+    }
+
+    .shift {
+      background: #e5f8ff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: inline-block;
+      color: #167c9d;
+      font-weight: 600;
+    }
+
+    .employees {
+      display: grid;
+      gap: 10px;
+    }
+
+    .employee {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px;
+      background: #f5fcff;
+      border-radius: 13px;
+    }
+
+    .employee-info strong {
+      display: block;
+    }
+
+    .employee-info span {
+      color: #78919b;
+      font-size: 12px;
+    }
+
+    .status {
+      font-size: 12px;
+      background: #e2f8ec;
+      color: #24814b;
+      padding: 6px 9px;
+      border-radius: 20px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 35px 15px;
+      color: #78919b;
+    }
+
+    @media (max-width: 650px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome h1 {
+        font-size: 24px;
+      }
+
+      .section {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <span class="bubble">🫧</span> BubbleSchedule
+  </div>
+
+  <button onclick="alert('Settings coming next!')">
+    Settings
+  </button>
+</header>
+
+<main class="container">
+
+  <div class="welcome">
+    <h1>Good morning 👋</h1>
+    <p>Here's what's happening with your team.</p>
+  </div>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-number" id="employeeCount">0</div>
+      <div class="stat-label">Employees</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Shifts This Week</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Time-Off Requests</div>
+    </div>
+
+  </div>
+
+  <section class="section">
+
+    <div class="section-header">
+      <h2>Weekly Schedule</h2>
+
+      <button onclick="alert('Shift creator coming next!')">
+        + Add Shift
+      </button>
+    </div>
+
+    <div class="schedule">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+          </tr>
+        </thead>
+
+        <tbody id="scheduleBody">
+
+          <tr>
+            <td colspan="6">
+              <div class="empty">
+                No shifts scheduled yet.
+                <br><br>
+                Click <strong>+ Add Shift</strong> to create your first shift.
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-header">
+      <h2>Employees</h2>
+
+      <button onclick="addEmployee()">
+        + Add Employee
+      </button>
+    </div>
+
+    <div class="employees" id="employeeList">
+
+      <div class="empty">
+        No employees added yet.
+        <br>
+        Add your first employee to get started.
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+
+  let employees = [];
+
+  function addEmployee() {
+
+    const name = prompt("Employee name:");
+
+    if (!name) return;
+
+    employees.push(name);
+
+    renderEmployees();
+
+  }
+
+  function renderEmployees() {
+
+    const list = document.getElementById("employeeList");
+
+    document.getElementById("employeeCount").textContent =
+      employees.length;
+
+    if (employees.length === 0) {
+
+      list.innerHTML = `
+        <div class="empty">
+          No employees added yet.
+        </div>
+      `;
+
+      return;
+    }
+
+    list.innerHTML = employees.map(employee => `
+
+      <div class="employee">
+
+        <div class="employee-info">
+          <strong>${employee}</strong>
+          <span>Employee</span>
+        </div>
+
+        <div class="status">
+          Active
+        </div>
+
+      </div>
+
+    `).join("");
+
+  }
+
+</script>
+
+</body>
+</html>
