@@ -1,0 +1,22 @@
+{
+  "name": "Bubble Schedule",
+  "short_name": "Bubble Schedule",
+  "description": "Simple scheduling for your team.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8f5ff",
+  "theme_color": "#d9c7ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "bubble-schedule-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "bubble-schedule-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
