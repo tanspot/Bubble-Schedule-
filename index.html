@@ -1,1632 +1,3223 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+<meta charset="UTF-8">
 
-  <meta name="theme-color" content="#d9c7ff" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="bubble-schedule-icon.png">
+<title>Bubble Schedule</title>
 
-  <title>Bubble Schedule</title>
+<meta name="theme-color" content="#d9c7ff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Bubble Schedule">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="bubble-schedule-icon.png">
 
-  <style>
-    * {
-      box-sizing: border-box;
+<link
+  rel="icon"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffd3e8'/%3E%3Cstop offset='.5' stop-color='%23d8cff9'/%3E%3Cstop offset='1' stop-color='%23c7edff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='110' fill='url(%23g)'/%3E%3Ccircle cx='210' cy='270' r='125' fill='white' fill-opacity='.8'/%3E%3Ccircle cx='330' cy='175' r='70' fill='white' fill-opacity='.65'/%3E%3Ccircle cx='115' cy='155' r='45' fill='white' fill-opacity='.7'/%3E%3Cpath d='M382 82l10 27 27 10-27 10-10 27-10-27-27-10 27-10z' fill='white'/%3E%3C/svg%3E"
+>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: #f8f5ff;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: Arial, sans-serif;
+  color: #40384a;
+
+  background:
+    radial-gradient(circle at 8% 8%, #ffd9ec, transparent 30%),
+    radial-gradient(circle at 92% 90%, #ccecff, transparent 32%),
+    linear-gradient(135deg, #faf2ff, #edfaff);
+
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* LOGIN */
+
+#loginScreen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  padding: 35px 26px;
+  text-align: center;
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 30px;
+  box-shadow: 0 20px 50px rgba(100,80,120,.15);
+}
+
+.bubble-logo {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+
+  background:
+    radial-gradient(circle at 30% 25%, white, transparent 20%),
+    linear-gradient(145deg, #ffd3e8, #d8cff9, #c7edff);
+
+  box-shadow:
+    0 10px 30px rgba(150,120,180,.2),
+    inset -10px -10px 20px rgba(255,255,255,.4);
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: #5a4b68;
+}
+
+h2,
+h3 {
+  color: #55485f;
+}
+
+.subtitle {
+  color: #8d8297;
+  margin-bottom: 25px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #66586f;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  border: 1px solid #eadfec;
+  background: white;
+  padding: 14px;
+  border-radius: 15px;
+  outline: none;
+}
+
+.input-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color: #c9a7df;
+  box-shadow: 0 0 0 3px rgba(201,167,223,.15);
+}
+
+.primary-button {
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  border-radius: 17px;
+
+  background:
+    linear-gradient(135deg, #e7a9c8, #aeb2e8, #8fd1eb);
+
+  color: white;
+  font-weight: 800;
+  box-shadow: 0 10px 25px rgba(150,120,180,.2);
+}
+
+.secondary-button {
+  border: 0;
+  padding: 11px 15px;
+  border-radius: 14px;
+  background: #f0e5fa;
+  color: #6d587b;
+  font-weight: 800;
+}
+
+.danger-button {
+  border: 0;
+  padding: 11px 15px;
+  border-radius: 14px;
+  background: #f8dfe9;
+  color: #a45877;
+  font-weight: 800;
+}
+
+.error {
+  color: #b34c6f;
+  margin-top: 10px;
+  font-size: 13px;
+  min-height: 18px;
+}
+
+/* APP */
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: 110px;
+}
+
+.topbar {
+  padding: 22px 20px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.small-bubble {
+  width: 45px;
+  height: 45px;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(145deg, #ffd3e8, #d8cff9, #c7edff);
+
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.brand strong {
+  display: block;
+  font-size: 18px;
+  color: #55485f;
+}
+
+.brand span {
+  font-size: 12px;
+  color: #91879c;
+}
+
+.logout-button {
+  border: 0;
+  background: rgba(255,255,255,.75);
+  color: #7c6d85;
+  padding: 10px 14px;
+  border-radius: 13px;
+  font-weight: 700;
+}
+
+.container {
+  width: calc(100% - 30px);
+  max-width: 900px;
+  margin: auto;
+}
+
+/* VIEWS */
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* HOME */
+
+.hero {
+  padding: 25px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 15px 40px rgba(100,80,120,.1);
+  margin-bottom: 20px;
+}
+
+.hero h2 {
+  margin: 0 0 7px;
+  font-size: 26px;
+  color: #51455d;
+}
+
+.hero p {
+  margin: 0;
+  color: #91879c;
+}
+
+.role-pill {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 7px 11px;
+  border-radius: 20px;
+  background: #f0e5fa;
+  color: #806796;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.section-title {
+  margin: 25px 5px 12px;
+  color: #66586f;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 15px;
+}
+
+.card {
+  background: rgba(255,255,255,.82);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(100,80,120,.08);
+}
+
+.stat-number {
+  font-size: 30px;
+  font-weight: 900;
+  color: #63516e;
+}
+
+.stat-label {
+  color: #93889d;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.quick-button {
+  width: 100%;
+  border: 0;
+  background: linear-gradient(135deg, #fff, #f6edff);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: left;
+  box-shadow: 0 10px 25px rgba(100,80,120,.07);
+}
+
+.quick-button strong {
+  display: block;
+  color: #5d4d68;
+  margin-bottom: 5px;
+}
+
+.quick-button span {
+  color: #93889d;
+  font-size: 13px;
+}
+
+/* HEADERS */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 18px;
+}
+
+.back-button {
+  border: 0;
+  background: rgba(255,255,255,.8);
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  font-size: 20px;
+}
+
+/* TEAM */
+
+.team-list {
+  display: grid;
+  gap: 14px;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.member-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+
+  display: grid;
+  place-items: center;
+
+  background:
+    linear-gradient(145deg, #ffd6e9, #d8cff9, #c6eafa);
+
+  font-size: 25px;
+}
+
+.member-info {
+  min-width: 0;
+}
+
+.member-info strong {
+  display: block;
+  color: #5d5067;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.member-info span {
+  display: block;
+  margin-top: 4px;
+  color: #958a9e;
+  font-size: 13px;
+  text-transform: capitalize;
+  overflow-wrap: anywhere;
+}
+
+.member-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.member-actions button {
+  flex: 1;
+}
+
+.notice {
+  padding: 13px;
+  border-radius: 15px;
+  background: #f7effd;
+  color: #705d80;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+/* SCHEDULE */
+
+.shift-card {
+  margin-bottom: 14px;
+}
+
+.shift-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.shift-date {
+  font-weight: 900;
+  color: #5d5067;
+}
+
+.shift-time {
+  color: #806796;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.shift-employee {
+  margin-top: 6px;
+  color: #91879c;
+}
+
+.shift-notes {
+  margin-top: 9px;
+  color: #6f6377;
+}
+/* ==============================
+   WEEKLY SCHEDULE
+============================== */
+
+const dayNames = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"
+];
+
+async function loadWeeklySchedule() {
+
+  const container =
+    element("weeklyScheduleTable");
+
+  if (!container) return;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("weekly_schedule")
+      .select("*")
+      .order("employee_id")
+      .order("day_of_week");
+
+  if (error) {
+
+    container.innerHTML =
+      `<div class="notice">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  renderWeeklySchedule(data || []);
+  renderCoworkerSchedule(data || []);
+}
+
+
+function renderWeeklySchedule(schedule) {
+
+  const container =
+    element("weeklyScheduleTable");
+
+  if (!teamMembers.length) {
+
+    container.innerHTML =
+      `<div class="empty">
+        Add team members first 🫧
+      </div>`;
+
+    return;
+  }
+
+  let html = `
+    <table
+      style="
+        width:100%;
+        min-width:900px;
+        border-collapse:separate;
+        border-spacing:6px;
+      "
+    >
+
+      <thead>
+        <tr>
+
+          <th style="padding:10px;">
+            Employee
+          </th>
+
+  `;
+
+  dayNames.forEach(day => {
+
+    html += `
+      <th
+        style="
+          padding:10px;
+          color:#66586f;
+          font-size:13px;
+        "
+      >
+        ${day}
+      </th>
+    `;
+
+  });
+
+  html += `
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+
+  teamMembers.forEach(employee => {
+
+    html += `
+      <tr>
+
+        <td
+          style="
+            padding:10px;
+            background:#f1e6fa;
+            border-radius:14px;
+            font-weight:800;
+            white-space:nowrap;
+          "
+        >
+          ${escapeHtml(employee.full_name)}
+        </td>
+    `;
+
+
+    for (let day = 0; day < 7; day++) {
+
+      const existing =
+        schedule.find(item =>
+          item.employee_id === employee.id &&
+          Number(item.day_of_week) === day
+        );
+
+      const start =
+        existing?.start_time
+          ? existing.start_time.substring(0,5)
+          : "";
+
+      const end =
+        existing?.end_time
+          ? existing.end_time.substring(0,5)
+          : "";
+
+      const dayOff =
+        existing?.is_day_off || false;
+
+
+      html += `
+        <td
+          style="
+            background:#faf7fd;
+            border:1px solid #eadfec;
+            border-radius:15px;
+            padding:8px;
+            min-width:125px;
+          "
+        >
+
+          <input
+            type="time"
+            class="weekly-start"
+            data-employee="${employee.id}"
+            data-day="${day}"
+            value="${start}"
+            style="
+              width:100%;
+              padding:8px;
+              border:1px solid #eadfec;
+              border-radius:10px;
+              margin-bottom:5px;
+            "
+          >
+
+          <input
+            type="time"
+            class="weekly-end"
+            data-employee="${employee.id}"
+            data-day="${day}"
+            value="${end}"
+            style="
+              width:100%;
+              padding:8px;
+              border:1px solid #eadfec;
+              border-radius:10px;
+            "
+          >
+
+          <label
+            style="
+              display:flex;
+              align-items:center;
+              gap:5px;
+              font-size:12px;
+              margin-top:7px;
+            "
+          >
+
+            <input
+              type="checkbox"
+              class="weekly-off"
+              data-employee="${employee.id}"
+              data-day="${day}"
+              ${dayOff ? "checked" : ""}
+            >
+
+            OFF
+
+          </label>
+
+        </td>
+      `;
     }
 
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 10% 10%, rgba(255,255,255,.9) 0 30px, transparent 31px),
-        radial-gradient(circle at 90% 15%, rgba(255,255,255,.65) 0 45px, transparent 46px),
-        linear-gradient(135deg, #eef7ff, #f8f1ff, #fff4fb);
-      min-height: 100vh;
-      color: #40394d;
+
+    html += `
+      </tr>
+    `;
+
+  });
+
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+
+  container.innerHTML = html;
+}
+
+
+async function saveWeeklyScheduleData() {
+
+  const message =
+    element("weeklyScheduleMessage");
+
+  message.textContent = "";
+
+
+  const records = [];
+
+
+  teamMembers.forEach(employee => {
+
+    for (let day = 0; day < 7; day++) {
+
+      const startInput =
+        document.querySelector(
+          `.weekly-start[data-employee="${employee.id}"][data-day="${day}"]`
+        );
+
+      const endInput =
+        document.querySelector(
+          `.weekly-end[data-employee="${employee.id}"][data-day="${day}"]`
+        );
+
+      const offInput =
+        document.querySelector(
+          `.weekly-off[data-employee="${employee.id}"][data-day="${day}"]`
+        );
+
+
+      records.push({
+        employee_id: employee.id,
+        day_of_week: day,
+        start_time:
+          offInput.checked
+            ? null
+            : startInput.value || null,
+        end_time:
+          offInput.checked
+            ? null
+            : endInput.value || null,
+        is_day_off:
+          offInput.checked
+      });
+
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
+  });
+
+
+  const {
+    error: deleteError
+  } =
+    await supabaseClient
+      .from("weekly_schedule")
+      .delete()
+      .neq(
+        "employee_id",
+        "00000000-0000-0000-0000-000000000000"
+      );
+
+
+  if (deleteError) {
+
+    message.textContent =
+      deleteError.message;
+
+    return;
+  }
+
+
+  const {
+    error: insertError
+  } =
+    await supabaseClient
+      .from("weekly_schedule")
+      .insert(records);
+
+
+  if (insertError) {
+
+    message.textContent =
+      insertError.message;
+
+    return;
+  }
+
+
+  message.style.color = "#6d9b7c";
+
+  message.textContent =
+    "Weekly schedule saved! 🫧";
+
+
+  await loadWeeklySchedule();
+
+}
+
+
+function renderCoworkerSchedule(schedule) {
+
+  const container =
+    element("coworkerSchedule");
+
+  if (!container || !currentUser) {
+    return;
+  }
+
+
+  const myEmployee =
+    teamMembers.find(
+      employee =>
+        employee.user_id === currentUser.id
+    );
+
+
+  if (!myEmployee) {
+
+    container.innerHTML =
+      `<div class="empty">
+        Your employee account is not linked yet.
+      </div>`;
+
+    return;
+  }
+
+
+  const myShifts =
+    schedule.filter(
+      item =>
+        item.employee_id === myEmployee.id &&
+        !item.is_day_off &&
+        item.start_time &&
+        item.end_time
+    );
+
+
+  if (!myShifts.length) {
+
+    container.innerHTML =
+      `<div class="empty">
+        No regular shifts have been set yet.
+      </div>`;
+
+    return;
+  }
+
+
+  let html = "";
+
+
+  myShifts
+    .sort(
+      (a,b) =>
+        Number(a.day_of_week) -
+        Number(b.day_of_week)
+    )
+    .forEach(myShift => {
+
+      const coworkers =
+        schedule.filter(
+          other =>
+            other.employee_id !== myEmployee.id &&
+            Number(other.day_of_week) ===
+              Number(myShift.day_of_week) &&
+            !other.is_day_off &&
+            other.start_time &&
+            other.end_time &&
+            timesOverlap(
+              myShift.start_time,
+              myShift.end_time,
+              other.start_time,
+              other.end_time
+            )
+        );
+
+
+      html += `
+
+        <div
+          style="
+            padding:14px;
+            margin-bottom:10px;
+            background:#f7effd;
+            border-radius:16px;
+          "
+        >
+
+          <strong>
+            ${dayNames[myShift.day_of_week]}
+          </strong>
+
+          <div class="muted">
+            Your shift:
+            ${formatTime(myShift.start_time)}
+            –
+            ${formatTime(myShift.end_time)}
+          </div>
+
+          ${
+            coworkers.length
+              ? `
+                <div
+                  style="
+                    margin-top:10px;
+                    color:#705d80;
+                    font-weight:700;
+                  "
+                >
+                  👯‍♀️ Working with:
+                </div>
+
+                ${coworkers.map(person => {
+
+                  const coworker =
+                    teamMembers.find(
+                      member =>
+                        member.id ===
+                        person.employee_id
+                    );
+
+                  return `
+                    <div
+                      style="
+                        margin-top:6px;
+                        padding:9px;
+                        background:white;
+                        border-radius:12px;
+                      "
+                    >
+                      ${escapeHtml(
+                        coworker?.full_name ||
+                        "Coworker"
+                      )}
+
+                      <span
+                        class="muted"
+                      >
+                        ·
+                        ${formatTime(person.start_time)}
+                        –
+                        ${formatTime(person.end_time)}
+                      </span>
+                    </div>
+                  `;
+
+                }).join("")}
+              `
+              : `
+                <div
+                  class="muted"
+                  style="margin-top:8px;"
+                >
+                  You're working alone this day.
+                </div>
+              `
+          }
+
+        </div>
+
+      `;
+
+    });
+
+
+  container.innerHTML = html;
+}
+
+
+function timesOverlap(
+  startA,
+  endA,
+  startB,
+  endB
+) {
+
+  return (
+    startA < endB &&
+    endA > startB
+  );
+
+}
+
+
+/* OPEN WEEKLY SCHEDULE */
+
+element("openWeeklySchedule")
+  ?.addEventListener(
+    "click",
+    async function() {
+
+      showView("weeklySchedule");
+
+      await loadWeeklySchedule();
+
     }
+  );
 
-    button {
-      cursor: pointer;
-      border: 0;
-    }
 
-    .bubble {
-      position: fixed;
-      border-radius: 50%;
-      background: rgba(255,255,255,.35);
-      pointer-events: none;
-      z-index: 0;
-    }
+/* SAVE WEEKLY SCHEDULE */
 
-    .bubble.one {
-      width: 120px;
-      height: 120px;
-      top: 70px;
-      left: -40px;
-    }
+element("saveWeeklySchedule")
+  ?.addEventListener(
+    "click",
+    saveWeeklyScheduleData
+  );
+/* CHECKLIST */
 
-    .bubble.two {
-      width: 180px;
-      height: 180px;
-      right: -70px;
-      top: 250px;
-    }
+.checklist-card {
+  margin-bottom: 14px;
+}
 
-    .bubble.three {
-      width: 90px;
-      height: 90px;
-      bottom: 100px;
-      left: 10%;
-    }
+.checklist-title {
+  font-weight: 900;
+  color: #5d5067;
+}
 
-    .app {
-      position: relative;
-      z-index: 1;
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
-      padding-bottom: 100px;
-    }
+.checklist-description {
+  color: #91879c;
+  margin-top: 7px;
+}
 
-    .hidden {
-      display: none !important;
-    }
+/* BOTTOM NAV */
 
-    .logo {
-      text-align: center;
-      margin: 20px 0 25px;
-    }
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(94%, 650px);
 
-    .logo h1 {
-      margin: 0;
-      font-size: 34px;
-      color: #8d73bd;
-    }
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 7px;
+  padding: 8px;
 
-    .logo p {
-      margin: 5px 0 0;
-      color: #887e94;
-    }
+  background: rgba(255,255,255,.92);
 
-    .card {
-      background: rgba(255,255,255,.82);
-      border: 1px solid rgba(255,255,255,.9);
-      border-radius: 24px;
-      padding: 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 10px 35px rgba(113, 91, 145, .10);
-      backdrop-filter: blur(12px);
-    }
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 
-    .login-card {
-      max-width: 430px;
-      margin: 80px auto;
-    }
+  border-radius: 23px;
 
-    h2,
-    h3 {
-      margin-top: 0;
-    }
+  box-shadow:
+    0 12px 35px rgba(100,80,120,.18);
 
-    label {
-      display: block;
-      margin: 12px 0 6px;
-      font-weight: 600;
-      font-size: 14px;
-    }
+  z-index: 20;
+}
 
-    input,
-    select,
-    textarea {
-      width: 100%;
-      border: 1px solid #ddd2ea;
-      border-radius: 14px;
-      padding: 12px 14px;
-      background: white;
-      color: #40394d;
-      outline: none;
-    }
+.nav-button {
+  border: 0;
+  background: transparent;
+  border-radius: 17px;
+  padding: 9px 5px;
+  color: #8b7c95;
+  font-weight: 800;
+  font-size: 12px;
+}
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: #b59add;
-      box-shadow: 0 0 0 3px rgba(181,154,221,.15);
-    }
+.nav-button.active {
+  background: #f1e6fa;
+  color: #6d587b;
+}
 
-    .btn {
-      background: linear-gradient(135deg, #b69bdf, #91c9e9);
-      color: white;
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-weight: 700;
-      margin-top: 12px;
-    }
+.nav-icon {
+  display: block;
+  font-size: 19px;
+  margin-bottom: 2px;
+}
 
-    .btn.secondary {
-      background: #eee7f7;
-      color: #665579;
-    }
+.empty {
+  text-align: center;
+  color: #91879c;
+  padding: 25px;
+}
 
-    .btn.danger {
-      background: #f4c6d2;
-      color: #713b4b;
-    }
+.muted {
+  color: #91879c;
+  font-size: 13px;
+}
 
-    .btn.small {
-      padding: 8px 12px;
-      font-size: 13px;
-      margin-top: 5px;
-    }
+/* MOBILE */
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
+@media (max-width: 500px) {
 
-    .welcome {
-      font-size: 15px;
-      color: #80758d;
-    }
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
-    .nav {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(94%, 650px);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      background: rgba(255,255,255,.92);
-      padding: 8px;
-      border-radius: 24px;
-      box-shadow: 0 10px 35px rgba(75,55,100,.18);
-      z-index: 20;
-      backdrop-filter: blur(15px);
-    }
+  .hero h2 {
+    font-size: 23px;
+  }
 
-    .nav button {
-      background: transparent;
-      color: #82758f;
-      padding: 10px 5px;
-      border-radius: 17px;
-      font-size: 12px;
-    }
+  .topbar {
+    padding-top: 18px;
+  }
 
-    .nav button.active {
-      background: #eee5fa;
-      color: #795fa2;
-      font-weight: 700;
-    }
+  .member-actions {
+    flex-direction: column;
+  }
 
-    .page {
-      display: none;
-    }
+  .member-actions button {
+    width: 100%;
+  }
+}
 
-    .page.active {
-      display: block;
-    }
+@media (max-width: 360px) {
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
+  .container {
+    width: calc(100% - 20px);
+  }
 
-    .employee-card {
-      border: 1px solid #e5ddef;
-      border-radius: 18px;
-      padding: 15px;
-      background: rgba(255,255,255,.65);
-    }
+  .hero {
+    padding: 20px;
+  }
 
-    .employee-name {
-      font-weight: 800;
-      font-size: 17px;
-    }
+  .grid {
+    gap: 10px;
+  }
 
-    .employee-role {
-      font-size: 13px;
-      color: #9589a0;
-      margin: 3px 0 12px;
-    }
+  .card {
+    padding: 16px;
+  }
 
-    .schedule-table-wrap {
-      overflow-x: auto;
-      border-radius: 18px;
-    }
+  .brand strong {
+    font-size: 16px;
+  }
 
-    .schedule-table {
-      width: 100%;
-      min-width: 850px;
-      border-collapse: separate;
-      border-spacing: 6px;
-    }
+  .logout-button {
+    padding: 8px 10px;
+  }
+}
 
-    .schedule-table th {
-      font-size: 13px;
-      color: #786c87;
-      padding: 8px;
-    }
-
-    .schedule-table td {
-      vertical-align: top;
-    }
-
-    .employee-label {
-      min-width: 130px;
-      background: #f3edf9;
-      border-radius: 16px;
-      padding: 12px;
-      font-weight: 700;
-    }
-
-    .day-cell {
-      background: #faf8fd;
-      border: 1px solid #ebe3f2;
-      border-radius: 16px;
-      padding: 8px;
-      min-width: 125px;
-    }
-
-    .day-cell.off {
-      background: #f3f3f5;
-      opacity: .8;
-    }
-
-    .time-row {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 5px;
-    }
-
-    .time-row input {
-      padding: 8px 6px;
-      font-size: 12px;
-      min-width: 0;
-    }
-
-    .off-label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-      margin: 5px 0;
-    }
-
-    .off-label input {
-      width: auto;
-    }
-
-    .coworker {
-      background: #eef7ff;
-      border-radius: 13px;
-      padding: 10px;
-      margin-top: 8px;
-      font-size: 13px;
-    }
-
-    .coworker strong {
-      display: block;
-    }
-
-    .notice {
-      padding: 12px 15px;
-      border-radius: 14px;
-      background: #f2eafd;
-      margin-bottom: 15px;
-      color: #68537e;
-    }
-
-    .error {
-      color: #a33f58;
-      background: #fdebef;
-      padding: 10px;
-      border-radius: 12px;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    .success {
-      color: #39705c;
-      background: #e9f8f0;
-      padding: 10px;
-      border-radius: 12px;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 30px 15px;
-      color: #978ca0;
-    }
-
-    @media (max-width: 700px) {
-      .app {
-        padding: 12px;
-        padding-bottom: 100px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        align-items: flex-start;
-      }
-
-      .topbar .btn {
-        margin-top: 0;
-      }
-
-      .logo h1 {
-        font-size: 29px;
-      }
-    }
-  </style>
+</style>
 </head>
 
 <body>
 
-  <div class="bubble one"></div>
-  <div class="bubble two"></div>
-  <div class="bubble three"></div>
+<!-- LOGIN -->
 
-  <div id="loginScreen" class="app">
+<div id="loginScreen">
 
-    <div class="login-card card">
+  <div class="login-card">
 
-      <div class="logo">
-        <h1>🫧 Bubble Schedule</h1>
-        <p>Simple scheduling for your team.</p>
+    <div class="bubble-logo">
+      🫧
+    </div>
+
+    <h1>Bubble Schedule</h1>
+
+    <div class="subtitle">
+      Simple scheduling for your team
+    </div>
+
+    <form id="loginForm">
+
+      <div class="input-group">
+
+        <label>Email</label>
+
+        <input
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+
       </div>
 
-      <label>Email</label>
-      <input id="loginEmail" type="email" placeholder="you@example.com">
+      <div class="input-group">
 
-      <label>Password</label>
-      <input id="loginPassword" type="password" placeholder="Password">
+        <label>Password</label>
 
-      <button class="btn" style="width:100%;" onclick="login()">
-        Log In
+        <input
+          id="password"
+          type="password"
+          placeholder="Your password"
+          autocomplete="current-password"
+          required
+        >
+
+      </div>
+
+      <button
+        class="primary-button"
+        type="submit"
+      >
+        Log In 🫧
       </button>
 
-      <div id="loginError"></div>
+      <div
+        id="loginError"
+        class="error"
+      ></div>
 
-    </div>
+    </form>
 
   </div>
 
+</div>
 
-  <div id="appScreen" class="app hidden">
+<!-- APP -->
 
-    <div class="topbar">
-      <div>
-        <div class="welcome" id="welcomeText"></div>
-        <h2 style="margin:3px 0 0;">Bubble Schedule 🫧</h2>
+<div id="app" class="hidden">
+
+  <div class="topbar">
+
+    <div class="brand">
+
+      <div class="small-bubble">
+        🫧
       </div>
 
-      <button class="btn secondary" onclick="logout()">
-        Log Out
-      </button>
+      <div>
+        <strong>Bubble Schedule</strong>
+        <span>Team scheduling</span>
+      </div>
+
     </div>
 
+    <button
+      id="logoutButton"
+      class="logout-button"
+    >
+      Log Out
+    </button>
+
+  </div>
+
+  <main class="container">
 
     <!-- HOME -->
 
-    <section id="homePage" class="page active">
+    <section
+      id="homeView"
+      class="view active"
+    >
 
-      <div class="card">
-        <h2>Good morning! 🫧</h2>
+      <div class="hero">
+
+        <h2 id="welcome">
+          Welcome!
+        </h2>
+
         <p>
-          Welcome back to your Bubble Schedule dashboard.
+          Keep your team organized and your schedule running smoothly.
         </p>
+
+        <div
+          id="roleDisplay"
+          class="role-pill"
+        ></div>
+
       </div>
 
-      <div class="card">
-        <h3>Today's Schedule</h3>
-        <div id="todaySchedule"></div>
+      <div class="section-title">
+        Overview
+      </div>
+
+      <div class="grid">
+
+        <div class="card">
+
+          <div
+            id="teamStat"
+            class="stat-number"
+          >
+            0
+          </div>
+
+          <div class="stat-label">
+            Team Members
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div
+            id="todayStat"
+            class="stat-number"
+          >
+            0
+          </div>
+
+          <div class="stat-label">
+            Scheduled Today
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="section-title">
+        Quick Actions
+      </div>
+
+      <div class="grid">
+
+        <button
+          class="quick-button"
+          data-view="schedule"
+        >
+          <strong>📅 Schedule</strong>
+          <span>View your team's schedule</span>
+        </button>
+
+        <button
+          class="quick-button"
+          data-view="team"
+        >
+          <strong>👥 Manage Team</strong>
+          <span>Add employees and send invitations</span>
+        </button>
+
+        <button
+          class="quick-button"
+          data-view="notes"
+        >
+          <strong>💌 Private Notes</strong>
+          <span>Private messages between team members</span>
+        </button>
+
+        <button
+          class="quick-button"
+          data-view="checklists"
+        >
+          <strong>✅ Checklists</strong>
+          <span>Assign and track tasks</span>
+        </button>
+
       </div>
 
     </section>
-
 
     <!-- SCHEDULE -->
 
-    <section id="schedulePage" class="page">
+    <section
+      id="scheduleView"
+      class="view"
+    >
 
-      <div class="card">
+      <div class="page-header">
 
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
-          <div>
-            <h2 style="margin-bottom:4px;">Weekly Schedule 📅</h2>
-            <p style="margin:0;color:#8d8297;">
-              Set the normal schedule for your team.
-            </p>
+        <div>
+          <h2>Schedule</h2>
+          <div class="muted">Your team's shifts</div>
+        </div>
+
+      </div>
+
+      <div
+        id="managerShiftForm"
+        class="card hidden"
+      >
+
+        <h3>Add Shift</h3>
+
+        <div class="input-group">
+
+          <label>Employee</label>
+
+          <select id="shiftEmployee"></select>
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Date</label>
+
+          <input
+            id="shiftDate"
+            type="date"
+          >
+
+        </div>
+
+        <div class="grid">
+
+          <div class="input-group">
+
+            <label>Start</label>
+
+            <input
+              id="shiftStart"
+              type="time"
+            >
+
           </div>
 
-          <button
-            id="saveScheduleButton"
-            class="btn"
-            onclick="saveWeeklySchedule()"
-          >
-            Save Schedule
-          </button>
+          <div class="input-group">
+
+            <label>End</label>
+
+            <input
+              id="shiftEnd"
+              type="time"
+            >
+
+          </div>
 
         </div>
 
-        <div id="scheduleMessage"></div>
+        <div class="input-group">
 
-        <div class="schedule-table-wrap" style="margin-top:20px;">
-          <table class="schedule-table">
+          <label>Notes</label>
 
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Sunday</th>
-                <th>Monday</th>
-                <th>Tuesday</th>
-                <th>Wednesday</th>
-                <th>Thursday</th>
-                <th>Friday</th>
-                <th>Saturday</th>
-              </tr>
-            </thead>
+          <textarea
+            id="shiftNotes"
+            placeholder="Optional notes"
+          ></textarea>
 
-            <tbody id="weeklyScheduleBody"></tbody>
-
-          </table>
         </div>
 
+        <button
+          id="saveShift"
+          class="primary-button"
+        >
+          Add Shift
+        </button>
+
+        <div
+          id="shiftMessage"
+          class="error"
+        ></div>
+
+      </div>
+<button
+  id="openWeeklySchedule"
+  class="primary-button"
+  style="margin-bottom:18px;"
+>
+  📅 Set Weekly Schedule
+</button>
+      <div class="section-title">
+        Upcoming Shifts
       </div>
 
-
-      <div class="card">
-
-        <h2>Who's Working With Me? 👯‍♀️</h2>
-
-        <p style="color:#8d8297;">
-          Employees can see who is scheduled alongside them.
-        </p>
-
-        <div id="coworkerSchedule"></div>
-
-      </div>
+      <div id="shiftList"></div>
 
     </section>
-
 
     <!-- TEAM -->
 
-    <section id="teamPage" class="page">
+    <section
+      id="teamView"
+      class="view"
+    >
 
-      <div class="card">
+      <div class="page-header">
 
-        <h2>Team 👥</h2>
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
-        <div id="teamList"></div>
+        <div>
+
+          <h2>Your Team</h2>
+
+          <div
+            id="teamCount"
+            class="muted"
+          >
+            0 members
+          </div>
+
+        </div>
 
       </div>
 
-      <div class="card">
+      <div
+        id="managerTeamArea"
+        class="card hidden"
+      >
 
         <h3>Add Team Member</h3>
 
-        <label>Name</label>
-        <input id="newEmployeeName" placeholder="Employee name">
-
-        <label>Role</label>
-
-        <select id="newEmployeeRole">
-          <option value="employee">Employee</option>
-          <option value="manager">Manager</option>
-        </select>
-
-        <label>Email</label>
-        <input id="newEmployeeEmail" type="email" placeholder="employee@email.com">
-
-        <button class="btn" onclick="addTeamMember()">
-          Add Employee
-        </button>
-
-        <div id="teamMessage"></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- SETTINGS -->
-
-    <section id="settingsPage" class="page">
-
-      <div class="card">
-
-        <h2>Settings ⚙️</h2>
-
         <div class="notice">
-          Bubble Schedule settings will live here.
+          Add the employee's name and email.
+          They will receive an invitation and create
+          their own password.
         </div>
 
-        <h3>Notifications</h3>
+        <div class="input-group">
 
-        <p>
-          Push notifications will be connected here next.
-        </p>
+          <label>Employee Name</label>
 
-        <button class="btn" onclick="requestNotifications()">
-          Enable Notifications
-        </button>
+          <input
+            id="newTeamName"
+            type="text"
+            placeholder="Employee name"
+          >
 
-        <div id="notificationMessage"></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- PRIVATE NOTES -->
-
-    <section id="notesPage" class="page">
-
-      <div class="card">
-
-        <h2>Private Notes 💌</h2>
-
-        <div class="notice">
-          Private manager/employee messaging is coming next.
         </div>
 
+        <div class="input-group">
+
+          <label>Employee Email</label>
+
+          <input
+            id="newTeamEmail"
+            type="email"
+            placeholder="employee@email.com"
+          >
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Role</label>
+
+          <select id="newTeamRole">
+
+            <option value="employee">
+              Employee
+            </option>
+
+            <option value="manager">
+              Manager
+            </option>
+
+          </select>
+
+        </div>
+
+        <button
+          id="saveTeamMember"
+          class="primary-button"
+        >
+          Add Employee 🫧
+        </button>
+
+        <div
+          id="teamFormMessage"
+          class="error"
+        ></div>
+
       </div>
 
-    </section>
-
-
-    <!-- CHECKLISTS -->
-
-    <section id="checklistsPage" class="page">
-
-      <div class="card">
-
-        <h2>Checklists ✅</h2>
-
-        <div id="checklistList"></div>
-
+      <div class="section-title">
+        Team Members
       </div>
 
+      <div
+        id="teamList"
+        class="team-list"
+      ></div>
+
     </section>
+<!-- WEEKLY SCHEDULE -->
+
+<section
+  id="weeklyScheduleView"
+  class="view"
+>
+
+  <div class="page-header">
+
+    <button
+      class="back-button"
+      data-view="schedule"
+    >
+      ←
+    </button>
+
+    <div>
+      <h2>Set Weekly Schedule</h2>
+      <div class="muted">
+        Your team's regular weekly hours
+      </div>
+    </div>
 
   </div>
 
+  <div class="card">
 
-  <!-- NAVIGATION -->
+    <div class="notice">
+      Set each employee's normal hours for every day of the week.
+      Employees will also be able to see who they're working with.
+    </div>
 
-  <nav id="bottomNav" class="nav hidden">
+    <div
+      id="weeklyScheduleTable"
+      style="overflow-x:auto;"
+    ></div>
 
-    <button onclick="showPage('homePage', this)" class="active">
-      🏠<br>Home
+    <button
+      id="saveWeeklySchedule"
+      class="primary-button"
+      style="margin-top:20px;"
+    >
+      Save Weekly Schedule 🫧
     </button>
 
-    <button onclick="showPage('schedulePage', this)">
-      📅<br>Schedule
+    <div
+      id="weeklyScheduleMessage"
+      class="error"
+    ></div>
+
+  </div>
+
+  <div class="card">
+
+    <h3>Who's Working With Me? 👯‍♀️</h3>
+
+    <div
+      id="coworkerSchedule"
+    >
+      <div class="empty">
+        Your coworkers will appear here.
+      </div>
+    </div>
+
+  </div>
+
+</section>
+    <!-- NOTES -->
+
+    <section
+      id="notesView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>Private Notes</h2>
+
+          <div class="muted">
+            Private team communication
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="notice">
+          Notes are designed so that only the
+          sender and recipient can see them.
+        </div>
+
+        <div
+          id="notesList"
+          class="empty"
+        >
+          No notes yet 🫧
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CHECKLISTS -->
+
+    <section
+      id="checklistsView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>Checklists</h2>
+
+          <div class="muted">
+            Tasks for your team
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        id="managerChecklistForm"
+        class="card hidden"
+      >
+
+        <h3>Assign Checklist</h3>
+
+        <div class="input-group">
+
+          <label>Title</label>
+
+          <input
+            id="checkTitle"
+            placeholder="Example: Closing checklist"
+          >
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Description</label>
+
+          <textarea
+            id="checkDescription"
+            placeholder="What needs to be done?"
+          ></textarea>
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Assign To</label>
+
+          <select id="checkEmployee"></select>
+
+        </div>
+
+        <button
+          id="saveChecklist"
+          class="primary-button"
+        >
+          Assign Checklist
+        </button>
+
+        <div
+          id="checkMessage"
+          class="error"
+        ></div>
+
+      </div>
+
+      <div class="section-title">
+        My Checklists
+      </div>
+
+      <div id="checklistList"></div>
+
+    </section>
+
+    <!-- SETTINGS -->
+
+    <section
+      id="settingsView"
+      class="view"
+    >
+
+      <div class="page-header">
+
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <h2>Settings</h2>
+
+          <div class="muted">
+            Your Bubble Schedule account
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h3 id="settingsName">
+          Account
+        </h3>
+
+        <p
+          id="settingsEmail"
+          class="muted"
+        ></p>
+
+        <div
+          id="settingsRole"
+          class="role-pill"
+        ></div>
+
+        <br><br>
+
+        <button
+          id="settingsLogout"
+          class="danger-button"
+          style="width:100%;"
+        >
+          Log Out
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-button active"
+      data-view="home"
+    >
+      <span class="nav-icon">🏠</span>
+      Home
     </button>
 
-    <button onclick="showPage('teamPage', this)">
-      👥<br>Team
+    <button
+      class="nav-button"
+      data-view="schedule"
+    >
+      <span class="nav-icon">📅</span>
+      Schedule
     </button>
 
-    <button onclick="showPage('settingsPage', this)">
-      ⚙️<br>Settings
+    <button
+      class="nav-button"
+      data-view="team"
+    >
+      <span class="nav-icon">👥</span>
+      Team
+    </button>
+
+    <button
+      class="nav-button"
+      data-view="settings"
+    >
+      <span class="nav-icon">⚙️</span>
+      Settings
     </button>
 
   </nav>
 
+</div>
 
 <script>
 
-  /* =====================================================
-     SUPABASE
-  ===================================================== */
+/* ==============================
+   SUPABASE
+============================== */
 
-  const SUPABASE_URL =
-    "https://sflhmsbqlrgkcukwcewj.supabase.co";
+const SUPABASE_URL =
+  "https://sflhmsbqlrgkcukwcewj.supabase.co";
 
-  /*
-    IMPORTANT:
-    Paste the exact Publishable Key you just copied
-    from Supabase between these quotation marks.
-  */
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_7iv8DqjXT_CG5M3zf8NY8g_ZvRW6NQ8";
 
-  const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_7iv8DqjXT_CG5M3zf8NY8g_ZvRW6NQ8";
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
 
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
+/* ==============================
+   STATE
+============================== */
+
+let currentUser = null;
+let currentProfile = null;
+let teamMembers = [];
+
+/* ==============================
+   HELPERS
+============================== */
+
+function element(id) {
+  return document.getElementById(id);
+}
+
+function escapeHtml(value) {
+
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[character])
+  );
+
+}
+
+function isManager() {
+
+  return (
+    currentProfile &&
+    (
+      currentProfile.role === "owner" ||
+      currentProfile.role === "manager"
+    )
+  );
+
+}
+
+/* ==============================
+   NAVIGATION
+============================== */
+
+function showView(viewName) {
+
+  document
+    .querySelectorAll(".view")
+    .forEach(view => {
+      view.classList.remove("active");
+    });
+
+  const view =
+    element(viewName + "View");
+
+  if (view) {
+    view.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.view === viewName
+      );
+    });
+
+  if (viewName === "team") {
+    loadTeam();
+  }
+
+  if (viewName === "schedule") {
+    loadShifts();
+  }
+
+  if (viewName === "checklists") {
+    loadChecklists();
+    if (viewName === "weeklySchedule") {
+  loadWeeklySchedule();
+}
+  }
+if (viewName === "weeklySchedule") {
+  loadWeeklySchedule();
+}
+}
+
+document
+  .querySelectorAll("[data-view]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      function() {
+        showView(this.dataset.view);
+      }
     );
 
+  });
 
-  let currentUser = null;
-  let currentProfile = null;
-  let teamMembers = [];
-  let weeklySchedule = [];
+/* ==============================
+   LOGIN
+============================== */
 
+element("loginForm")
+  .addEventListener(
+    "submit",
+    async function(event) {
 
-  /* =====================================================
-     LOGIN
-  ===================================================== */
+      event.preventDefault();
 
-  async function login() {
+      element("loginError").textContent = "";
 
-    const email =
-      document.getElementById("loginEmail").value.trim();
+      const email =
+        element("email").value.trim();
 
-    const password =
-      document.getElementById("loginPassword").value;
+      const password =
+        element("password").value;
 
-    const errorBox =
-      document.getElementById("loginError");
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .auth
+          .signInWithPassword({
+            email,
+            password
+          });
 
-    errorBox.innerHTML = "";
+      if (error) {
 
-    if (!email || !password) {
+        element("loginError").textContent =
+          error.message;
 
-      errorBox.innerHTML =
-        '<div class="error">Please enter your email and password.</div>';
+        return;
+      }
 
-      return;
+      await showApp(data.user);
+
     }
+  );
 
-    const { data, error } =
-      await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
+/* ==============================
+   SHOW APP
+============================== */
 
-    if (error) {
+async function showApp(user) {
 
-      errorBox.innerHTML =
-        `<div class="error">${escapeHtml(error.message)}</div>`;
+  currentUser = user;
 
-      return;
-    }
+  element("loginScreen").style.display = "none";
+  element("app").classList.remove("hidden");
 
-    currentUser = data.user;
+  const {
+    data: profile,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("id, full_name, role")
+      .eq("id", user.id)
+      .single();
 
-    await initializeApp();
+  if (error || !profile) {
+
+    console.error("PROFILE ERROR:", error);
+
+    element("welcome").textContent =
+      "Welcome!";
+
+    return;
   }
 
+  currentProfile = profile;
 
-  async function logout() {
+  element("welcome").textContent =
+    profile.full_name
+      ? "Welcome, " + profile.full_name + "!"
+      : "Welcome!";
 
-    await supabaseClient.auth.signOut();
+  element("roleDisplay").textContent =
+    profile.role || "";
 
-    currentUser = null;
-    currentProfile = null;
+  element("settingsName").textContent =
+    profile.full_name || "Account";
 
-    document
-      .getElementById("appScreen")
+  element("settingsEmail").textContent =
+    user.email || "";
+
+  element("settingsRole").textContent =
+    profile.role || "";
+
+  if (isManager()) {
+
+    element("managerTeamArea")
+      .classList.remove("hidden");
+
+    element("managerShiftForm")
+      .classList.remove("hidden");
+
+    element("managerChecklistForm")
+      .classList.remove("hidden");
+
+  } else {
+
+    element("managerTeamArea")
       .classList.add("hidden");
 
-    document
-      .getElementById("bottomNav")
+    element("managerShiftForm")
       .classList.add("hidden");
 
-    document
-      .getElementById("loginScreen")
-      .classList.remove("hidden");
-  }
-
-
-  /* =====================================================
-     INITIALIZE
-  ===================================================== */
-
-  async function initializeApp() {
-
-    document
-      .getElementById("loginScreen")
+    element("managerChecklistForm")
       .classList.add("hidden");
 
-    document
-      .getElementById("appScreen")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("bottomNav")
-      .classList.remove("hidden");
-
-    await loadProfile();
-
-    await loadTeam();
-
-    await loadWeeklySchedule();
-
-    await loadTodaySchedule();
-
-    await loadCoworkers();
-
-    document.getElementById("welcomeText").textContent =
-      `Welcome, ${currentProfile?.full_name || currentUser.email}`;
   }
 
+  await loadTeam();
+  await loadShifts();
+  await loadChecklists();
 
-  async function loadProfile() {
+}
 
-    const { data, error } =
-      await supabaseClient
-        .from("profiles")
-        .select("id, full_name, role")
-        .eq("id", currentUser.id)
-        .single();
+/* ==============================
+   LOGOUT
+============================== */
 
-    if (error) {
+async function logout() {
 
-      console.error(error);
+  await supabaseClient.auth.signOut();
 
-      currentProfile = {
-        id: currentUser.id,
-        full_name: currentUser.email,
-        role: "employee"
-      };
+  currentUser = null;
+  currentProfile = null;
+  teamMembers = [];
 
-      return;
-    }
+  element("app").classList.add("hidden");
 
-    currentProfile = data;
+  element("loginScreen").style.display = "flex";
+
+  element("loginForm").reset();
+
+  showView("home");
+
+}
+
+element("logoutButton")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+element("settingsLogout")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+/* ==============================
+   LOAD TEAM
+============================== */
+
+async function loadTeam() {
+
+  const list =
+    element("teamList");
+
+  list.innerHTML =
+    `<div class="card empty">
+      Loading your team... 🫧
+    </div>`;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("team_members")
+      .select(
+        "id, full_name, role, email, user_id"
+      )
+      .order("full_name");
+
+  if (error) {
+
+    list.innerHTML =
+      `<div class="card">
+        <strong>Unable to load team members.</strong>
+        <p class="muted">
+          ${escapeHtml(error.message)}
+        </p>
+      </div>`;
+
+    return;
   }
 
+  teamMembers = data || [];
 
-  /* =====================================================
-     TEAM
-  ===================================================== */
+  element("teamStat").textContent =
+    teamMembers.length;
 
-  async function loadTeam() {
+  element("teamCount").textContent =
+    teamMembers.length +
+    (
+      teamMembers.length === 1
+        ? " member"
+        : " members"
+    );
 
-    const { data, error } =
-      await supabaseClient
-        .from("team_members")
-        .select("id, full_name, role, email, user_id")
-        .order("full_name");
+  populateEmployeeSelects();
 
-    if (error) {
+  if (!teamMembers.length) {
 
-      console.error(error);
+    list.innerHTML =
+      `<div class="card empty">
+        No team members yet 🫧
+      </div>`;
 
-      document.getElementById("teamList").innerHTML =
-        `<div class="error">${escapeHtml(error.message)}</div>`;
-
-      return;
-    }
-
-    teamMembers = data || [];
-
-    renderTeam();
+    return;
   }
 
+  list.innerHTML =
+    teamMembers
+      .map(member => `
 
-  function renderTeam() {
+        <div class="card">
 
-    const container =
-      document.getElementById("teamList");
+          <div class="team-member">
 
-    if (!teamMembers.length) {
+            <div class="member-avatar">
+              ${
+                member.role === "manager"
+                  ? "👑"
+                  : "🫧"
+              }
+            </div>
 
-      container.innerHTML =
-        '<div class="empty">No team members yet.</div>';
+            <div class="member-info">
 
-      return;
-    }
+              <strong>
+                ${escapeHtml(member.full_name)}
+              </strong>
 
-    container.innerHTML =
-      teamMembers.map(employee => `
+              <span>
+                ${escapeHtml(member.role)}
 
-        <div class="employee-card">
+                ${
+                  member.email
+                    ? " · " +
+                      escapeHtml(member.email)
+                    : ""
+                }
+              </span>
 
-          <div class="employee-name">
-            ${escapeHtml(employee.full_name)}
+            </div>
+
           </div>
 
-          <div class="employee-role">
-            ${escapeHtml(employee.role || "employee")}
-          </div>
-
           ${
-            employee.email
-              ? `<div style="font-size:13px;color:#8d8297;">
-                  ${escapeHtml(employee.email)}
-                 </div>`
-              : ""
-          }
-
-          ${
-            employee.user_id
-              ? `<div style="font-size:12px;color:#5c9478;margin-top:7px;">
-                  ✓ Account connected
-                 </div>`
-              : `<div style="font-size:12px;color:#a88652;margin-top:7px;">
-                  Account not connected
-                 </div>`
-          }
-
-          ${
-            currentProfile?.role === "owner" ||
-            currentProfile?.role === "manager"
+            isManager()
               ? `
-                <button
-                  class="btn danger small"
-                  onclick="removeTeamMember('${employee.id}')"
-                >
-                  Remove
-                </button>
+
+                <div class="member-actions">
+
+                  ${
+                    member.user_id
+                      ? `
+                        <button
+                          class="secondary-button"
+                          disabled
+                        >
+                          Account Linked ✓
+                        </button>
+                      `
+                      : `
+                        <button
+                          class="primary-button"
+                          type="button"
+                          onclick="inviteEmployee('${member.id}')"
+                        >
+                          Send Invitation
+                        </button>
+                      `
+                  }
+
+                  <button
+                    class="danger-button"
+                    type="button"
+                    onclick="removeTeamMember('${member.id}')"
+                  >
+                    Remove
+                  </button>
+
+                </div>
+
               `
               : ""
           }
 
         </div>
 
-      `).join("");
-  }
+      `)
+      .join("");
 
+}
 
-  async function addTeamMember() {
+/* ==============================
+   EMPLOYEE SELECTS
+============================== */
 
-    const name =
-      document.getElementById("newEmployeeName")
-        .value.trim();
+function populateEmployeeSelects() {
 
-    const role =
-      document.getElementById("newEmployeeRole")
-        .value;
+  const options =
+    teamMembers
+      .map(member => `
+        <option value="${member.id}">
+          ${escapeHtml(member.full_name)}
+        </option>
+      `)
+      .join("");
 
-    const email =
-      document.getElementById("newEmployeeEmail")
-        .value.trim()
-        .toLowerCase();
+  element("shiftEmployee").innerHTML =
+    options ||
+    `<option value="">No employees</option>`;
 
-    const message =
-      document.getElementById("teamMessage");
+  element("checkEmployee").innerHTML =
+    options ||
+    `<option value="">No employees</option>`;
 
-    message.innerHTML = "";
+}
 
-    if (!name) {
+/* ==============================
+   ADD TEAM MEMBER
+============================== */
 
-      message.innerHTML =
-        '<div class="error">Please enter the employee name.</div>';
+element("saveTeamMember")
+  .addEventListener(
+    "click",
+    async function() {
 
-      return;
-    }
+      const name =
+        element("newTeamName")
+          .value
+          .trim();
 
-    const { data, error } =
-      await supabaseClient
-        .from("team_members")
-        .insert({
-          full_name: name,
-          role: role,
-          email: email || null
-        })
-        .select()
-        .single();
+      const email =
+        element("newTeamEmail")
+          .value
+          .trim()
+          .toLowerCase();
 
-    if (error) {
+      const role =
+        element("newTeamRole")
+          .value;
 
-      message.innerHTML =
-        `<div class="error">${escapeHtml(error.message)}</div>`;
+      const message =
+        element("teamFormMessage");
 
-      return;
-    }
+      message.textContent = "";
 
-    document.getElementById("newEmployeeName").value = "";
-    document.getElementById("newEmployeeEmail").value = "";
+      if (!name || !email) {
 
-    message.innerHTML =
-      '<div class="success">Employee added! 🫧</div>';
+        message.textContent =
+          "Please enter the employee's name and email.";
 
-    await loadTeam();
-  }
-
-
-  async function removeTeamMember(id) {
-
-    if (!confirm("Remove this team member?")) {
-      return;
-    }
-
-    const { error } =
-      await supabaseClient
-        .from("team_members")
-        .delete()
-        .eq("id", id);
-
-    if (error) {
-
-      alert(error.message);
-      return;
-    }
-
-    await loadTeam();
-
-    await loadWeeklySchedule();
-  }
-
-
-  /* =====================================================
-     WEEKLY SCHEDULE
-  ===================================================== */
-
-  async function loadWeeklySchedule() {
-
-    const { data, error } =
-      await supabaseClient
-        .from("weekly_schedule")
-        .select("*");
-
-    if (error) {
-
-      console.error(error);
-
-      document.getElementById("scheduleMessage").innerHTML =
-        `<div class="error">${escapeHtml(error.message)}</div>`;
-
-      return;
-    }
-
-    weeklySchedule = data || [];
-
-    renderWeeklySchedule();
-  }
-
-
-  function getSchedule(employeeId, day) {
-
-    return weeklySchedule.find(
-      item =>
-        item.employee_id === employeeId &&
-        Number(item.day_of_week) === day
-    );
-  }
-
-
-  function renderWeeklySchedule() {
-
-    const body =
-      document.getElementById("weeklyScheduleBody");
-
-    if (!teamMembers.length) {
-
-      body.innerHTML = `
-        <tr>
-          <td colspan="8">
-            <div class="empty">
-              Add employees first.
-            </div>
-          </td>
-        </tr>
-      `;
-
-      return;
-    }
-
-
-    const canEdit =
-      currentProfile?.role === "owner" ||
-      currentProfile?.role === "manager";
-
-
-    body.innerHTML =
-      teamMembers.map(employee => {
-
-        let cells = "";
-
-        for (let day = 0; day <= 6; day++) {
-
-          const schedule =
-            getSchedule(employee.id, day);
-
-          const start =
-            schedule?.start_time
-              ? schedule.start_time.substring(0,5)
-              : "";
-
-          const end =
-            schedule?.end_time
-              ? schedule.end_time.substring(0,5)
-              : "";
-
-          const off =
-            schedule?.is_day_off || false;
-
-
-          cells += `
-
-            <td>
-
-              <div
-                class="day-cell ${off ? "off" : ""}"
-                data-employee="${employee.id}"
-                data-day="${day}"
-              >
-
-                <div class="time-row">
-
-                  <input
-                    type="time"
-                    class="start-time"
-                    value="${start}"
-                    ${!canEdit ? "disabled" : ""}
-                  >
-
-                  <input
-                    type="time"
-                    class="end-time"
-                    value="${end}"
-                    ${!canEdit ? "disabled" : ""}
-                  >
-
-                </div>
-
-                <label class="off-label">
-
-                  <input
-                    type="checkbox"
-                    class="day-off"
-                    ${off ? "checked" : ""}
-                    ${!canEdit ? "disabled" : ""}
-                    onchange="toggleDayOff(this)"
-                  >
-
-                  OFF
-
-                </label>
-
-              </div>
-
-            </td>
-
-          `;
-        }
-
-
-        return `
-
-          <tr>
-
-            <td>
-              <div class="employee-label">
-                ${escapeHtml(employee.full_name)}
-              </div>
-            </td>
-
-            ${cells}
-
-          </tr>
-
-        `;
-
-      }).join("");
-
-
-    if (!canEdit) {
-
-      document
-        .getElementById("saveScheduleButton")
-        .classList.add("hidden");
-    }
-  }
-
-
-  function toggleDayOff(checkbox) {
-
-    const cell =
-      checkbox.closest(".day-cell");
-
-    const inputs =
-      cell.querySelectorAll("input[type='time']");
-
-    inputs.forEach(input => {
-
-      input.disabled = checkbox.checked;
-
-      if (checkbox.checked) {
-        input.value = "";
+        return;
       }
 
-    });
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("team_members")
+          .insert({
+            full_name: name,
+            email: email,
+            role: role
+          })
+          .select("id")
+          .single();
 
-    cell.classList.toggle(
-      "off",
-      checkbox.checked
+      if (error) {
+
+        message.textContent =
+          error.message;
+
+        return;
+      }
+
+      element("newTeamName").value = "";
+      element("newTeamEmail").value = "";
+      element("newTeamRole").value = "employee";
+
+      await loadTeam();
+
+      const sendNow =
+        confirm(
+          name +
+          " was added.\n\n" +
+          "Would you like to send their account invitation now?"
+        );
+
+      if (sendNow) {
+
+        await inviteEmployee(data.id);
+
+      } else {
+
+        message.style.color = "#6d9b7c";
+
+        message.textContent =
+          name +
+          " was added successfully! 🫧";
+      }
+
+    }
+  );
+
+/* ==============================
+   INVITE EMPLOYEE
+============================== */
+
+async function inviteEmployee(teamMemberId) {
+
+  const member =
+    teamMembers.find(
+      item =>
+        item.id === teamMemberId
     );
+
+  if (!member) {
+
+    alert("Employee could not be found.");
+    return;
   }
 
+  if (!member.email) {
 
-  async function saveWeeklySchedule() {
+    alert(
+      "This employee needs an email address first."
+    );
 
-    const message =
-      document.getElementById("scheduleMessage");
-
-    message.innerHTML = "";
-
-    const cells =
-      document.querySelectorAll(".day-cell");
-
-    const records = [];
-
-    cells.forEach(cell => {
-
-      const employeeId =
-        cell.dataset.employee;
-
-      const day =
-        Number(cell.dataset.day);
-
-      const start =
-        cell.querySelector(".start-time").value || null;
-
-      const end =
-        cell.querySelector(".end-time").value || null;
-
-      const off =
-        cell.querySelector(".day-off").checked;
-
-
-      records.push({
-        employee_id: employeeId,
-        day_of_week: day,
-        start_time: off ? null : start,
-        end_time: off ? null : end,
-        is_day_off: off
-      });
-
-    });
-
-
-    const { error: deleteError } =
-      await supabaseClient
-        .from("weekly_schedule")
-        .delete()
-        .neq("employee_id", "00000000-0000-0000-0000-000000000000");
-
-
-    if (deleteError) {
-
-      message.innerHTML =
-        `<div class="error">${escapeHtml(deleteError.message)}</div>`;
-
-      return;
-    }
-
-
-    const { error: insertError } =
-      await supabaseClient
-        .from("weekly_schedule")
-        .insert(records);
-
-
-    if (insertError) {
-
-      message.innerHTML =
-        `<div class="error">${escapeHtml(insertError.message)}</div>`;
-
-      return;
-    }
-
-
-    message.innerHTML =
-      '<div class="success">Weekly schedule saved! 🫧</div>';
-
-    await loadWeeklySchedule();
-
-    await loadCoworkers();
+    return;
   }
 
+  if (
+    !confirm(
+      "Send an account invitation to " +
+      member.full_name +
+      " at " +
+      member.email +
+      "?"
+    )
+  ) {
+    return;
+  }
 
-  /* =====================================================
-     COWORKERS
-  ===================================================== */
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .functions
+      .invoke(
+        "super-endpoint",
+        {
+          body: {
+            email: member.email,
+            team_member_id: member.id
+          }
+        }
+      );
 
-  async function loadCoworkers() {
+  if (error) {
 
-    const container =
-      document.getElementById("coworkerSchedule");
+    alert(
+      "INVITATION ERROR:\n\n" +
+      error.message
+    );
 
-    if (!currentUser) {
-      return;
-    }
+    return;
+  }
 
+  if (data && data.error) {
 
-    const myEmployee =
+    alert(
+      "INVITATION ERROR:\n\n" +
+      data.error
+    );
+
+    return;
+  }
+
+  alert(
+    "Invitation sent! 🫧\n\n" +
+    member.full_name +
+    " will create their own password."
+  );
+
+  await loadTeam();
+
+}
+
+/* ==============================
+   REMOVE TEAM MEMBER
+============================== */
+
+async function removeTeamMember(id) {
+
+  if (
+    !confirm(
+      "Remove this team member?"
+    )
+  ) {
+    return;
+  }
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("team_members")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    alert(
+      "REMOVE ERROR:\n\n" +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadTeam();
+
+}
+
+/* ==============================
+   LOAD SHIFTS
+============================== */
+
+async function loadShifts() {
+
+  const list =
+    element("shiftList");
+
+  let query =
+    supabaseClient
+      .from("shifts")
+      .select(`
+        id,
+        employee_id,
+        shift_date,
+        start_time,
+        end_time,
+        notes,
+        team_members(
+          full_name
+        )
+      `)
+      .order(
+        "shift_date",
+        { ascending: true }
+      )
+      .order(
+        "start_time",
+        { ascending: true }
+      );
+
+  if (!isManager() && currentUser) {
+
+    const mine =
       teamMembers.find(
-        employee =>
-          employee.user_id === currentUser.id
+        member =>
+          member.user_id === currentUser.id
       );
 
+    if (!mine) {
 
-    if (!myEmployee) {
-
-      container.innerHTML = `
-        <div class="notice">
-          Your employee account hasn't been connected
-          to a team member yet.
-        </div>
-      `;
-
-      return;
-    }
-
-
-    const mySchedule =
-      weeklySchedule.filter(
-        item =>
-          item.employee_id === myEmployee.id &&
-          !item.is_day_off &&
-          item.start_time &&
-          item.end_time
-      );
-
-
-    if (!mySchedule.length) {
-
-      container.innerHTML =
-        `<div class="empty">
-          No regular shifts have been scheduled yet.
+      list.innerHTML =
+        `<div class="card empty">
+          Your employee account is not linked yet.
         </div>`;
 
+      element("todayStat").textContent = "0";
+
       return;
     }
 
+    query =
+      query.eq(
+        "employee_id",
+        mine.id
+      );
+  }
 
-    const dayNames = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
-    ];
+  const {
+    data,
+    error
+  } =
+    await query;
 
+  if (error) {
 
-    let html = "";
+    list.innerHTML =
+      `<div class="card">
+        <strong>Unable to load schedule.</strong>
+        <p class="muted">
+          ${escapeHtml(error.message)}
+        </p>
+      </div>`;
 
+    return;
+  }
 
-    mySchedule
-      .sort((a,b) =>
-        a.day_of_week - b.day_of_week
-      )
-      .forEach(myShift => {
+  const shifts = data || [];
 
-        const coworkers =
-          weeklySchedule.filter(
-            other =>
-              other.employee_id !== myEmployee.id &&
-              other.day_of_week === myShift.day_of_week &&
-              !other.is_day_off &&
-              other.start_time &&
-              other.end_time &&
-              timesOverlap(
-                myShift.start_time,
-                myShift.end_time,
-                other.start_time,
-                other.end_time
-              )
-          );
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
 
+  element("todayStat").textContent =
+    shifts.filter(
+      shift =>
+        shift.shift_date === today
+    ).length;
 
-        html += `
+  if (!shifts.length) {
 
-          <div class="card" style="margin-bottom:10px;">
+    list.innerHTML =
+      `<div class="card empty">
+        No shifts scheduled yet 🫧
+      </div>`;
 
-            <strong>
-              ${dayNames[myShift.day_of_week]}
-            </strong>
+    return;
+  }
 
-            <div style="font-size:13px;color:#8d8297;margin-top:4px;">
-              Your shift:
-              ${formatTime(myShift.start_time)}
-              –
-              ${formatTime(myShift.end_time)}
+  list.innerHTML =
+    shifts
+      .map(shift => `
+
+        <div class="card shift-card">
+
+          <div class="shift-top">
+
+            <div class="shift-date">
+              ${formatDate(shift.shift_date)}
             </div>
 
+            <div class="shift-time">
+
+              ${formatTime(shift.start_time)}
+
+              ${
+                shift.end_time
+                  ? " – " +
+                    formatTime(shift.end_time)
+                  : ""
+              }
+
+            </div>
+
+          </div>
+
+          <div class="shift-employee">
+
             ${
-              coworkers.length
-                ? coworkers.map(person => `
-
-                    <div class="coworker">
-
-                      <strong>
-                        👯‍♀️ ${escapeHtml(personName(person.employee_id))}
-                      </strong>
-
-                      ${formatTime(person.start_time)}
-                      –
-                      ${formatTime(person.end_time)}
-
-                    </div>
-
-                  `).join("")
-                : `
-                  <div style="font-size:13px;color:#988da1;margin-top:10px;">
-                    You're working alone this day.
-                  </div>
-                `
+              escapeHtml(
+                shift.team_members?.full_name ||
+                "Employee"
+              )
             }
 
           </div>
 
-        `;
+          ${
+            shift.notes
+              ? `
+                <div class="shift-notes">
+                  ${escapeHtml(shift.notes)}
+                </div>
+              `
+              : ""
+          }
 
-      });
+          ${
+            isManager()
+              ? `
+                <div class="member-actions">
 
+                  <button
+                    class="danger-button"
+                    onclick="deleteShift('${shift.id}')"
+                  >
+                    Delete Shift
+                  </button>
 
-    container.innerHTML = html;
-  }
-
-
-  function personName(employeeId) {
-
-    const employee =
-      teamMembers.find(
-        item => item.id === employeeId
-      );
-
-    return employee
-      ? employee.full_name
-      : "Coworker";
-  }
-
-
-  function timesOverlap(
-    startA,
-    endA,
-    startB,
-    endB
-  ) {
-
-    return (
-      startA < endB &&
-      endA > startB
-    );
-  }
-
-
-  function formatTime(time) {
-
-    if (!time) return "";
-
-    const [hours, minutes] =
-      time.substring(0,5).split(":");
-
-    let hour = Number(hours);
-
-    const ampm =
-      hour >= 12 ? "PM" : "AM";
-
-    hour =
-      hour % 12 || 12;
-
-    return `${hour}:${minutes} ${ampm}`;
-  }
-
-
-  /* =====================================================
-     TODAY
-  ===================================================== */
-
-  async function loadTodaySchedule() {
-
-    const container =
-      document.getElementById("todaySchedule");
-
-    const today =
-      new Date().getDay();
-
-    const shifts =
-      weeklySchedule.filter(
-        item =>
-          Number(item.day_of_week) === today &&
-          !item.is_day_off &&
-          item.start_time &&
-          item.end_time
-      );
-
-
-    if (!shifts.length) {
-
-      container.innerHTML =
-        `<div class="empty">
-          No one is scheduled today.
-        </div>`;
-
-      return;
-    }
-
-
-    container.innerHTML =
-      shifts.map(shift => `
-
-        <div class="coworker">
-
-          <strong>
-            ${escapeHtml(personName(shift.employee_id))}
-          </strong>
-
-          ${formatTime(shift.start_time)}
-          –
-          ${formatTime(shift.end_time)}
+                </div>
+              `
+              : ""
+          }
 
         </div>
 
-      `).join("");
+      `)
+      .join("");
+
+}
+
+/* ==============================
+   ADD SHIFT
+============================== */
+
+element("saveShift")
+  .addEventListener(
+    "click",
+    async function() {
+
+      const employee_id =
+        element("shiftEmployee").value;
+
+      const shift_date =
+        element("shiftDate").value;
+
+      const start_time =
+        element("shiftStart").value || null;
+
+      const end_time =
+        element("shiftEnd").value || null;
+
+      const notes =
+        element("shiftNotes")
+          .value
+          .trim() || null;
+
+      const message =
+        element("shiftMessage");
+
+      message.textContent = "";
+
+      if (!employee_id || !shift_date) {
+
+        message.textContent =
+          "Choose an employee and date.";
+
+        return;
+      }
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("shifts")
+          .insert({
+            employee_id,
+            shift_date,
+            start_time,
+            end_time,
+            notes
+          });
+
+      if (error) {
+
+        message.textContent =
+          error.message;
+
+        return;
+      }
+
+      message.style.color = "#6d9b7c";
+      message.textContent = "Shift added! 🫧";
+
+      element("shiftDate").value = "";
+      element("shiftStart").value = "";
+      element("shiftEnd").value = "";
+      element("shiftNotes").value = "";
+
+      await loadShifts();
+
+    }
+  );
+
+/* ==============================
+   DELETE SHIFT
+============================== */
+
+async function deleteShift(id) {
+
+  if (
+    !confirm(
+      "Delete this shift?"
+    )
+  ) {
+    return;
   }
 
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("shifts")
+      .delete()
+      .eq("id", id);
 
-  /* =====================================================
-     NAVIGATION
-  ===================================================== */
+  if (error) {
 
-  function showPage(pageId, button) {
-
-    document
-      .querySelectorAll(".page")
-      .forEach(page =>
-        page.classList.remove("active")
-      );
-
-    document
-      .getElementById(pageId)
-      .classList.add("active");
-
-
-    document
-      .querySelectorAll(".nav button")
-      .forEach(btn =>
-        btn.classList.remove("active")
-      );
-
-    if (button) {
-      button.classList.add("active");
-    }
-
-
-    if (pageId === "schedulePage") {
-
-      loadWeeklySchedule();
-      loadCoworkers();
-    }
-
-    if (pageId === "teamPage") {
-      loadTeam();
-    }
-
-    if (pageId === "homePage") {
-      loadTodaySchedule();
-    }
+    alert(error.message);
+    return;
   }
 
+  await loadShifts();
 
-  /* =====================================================
-     NOTIFICATIONS
-  ===================================================== */
+}
 
-  async function requestNotifications() {
+/* ==============================
+   CHECKLISTS
+============================== */
 
-    const box =
-      document.getElementById("notificationMessage");
+async function loadChecklists() {
 
-    if (!("Notification" in window)) {
+  const list =
+    element("checklistList");
 
-      box.innerHTML =
-        `<div class="error">
-          Notifications aren't supported by this browser.
+  let query =
+    supabaseClient
+      .from("checklists")
+      .select(`
+        id,
+        title,
+        description,
+        assigned_employee_id,
+        completed,
+        created_at,
+        completed_at,
+        team_members(
+          full_name
+        )
+      `)
+      .order(
+        "created_at",
+        { ascending: false }
+      );
+
+  if (!isManager() && currentUser) {
+
+    const mine =
+      teamMembers.find(
+        member =>
+          member.user_id === currentUser.id
+      );
+
+    if (!mine) {
+
+      list.innerHTML =
+        `<div class="card empty">
+          Your employee account is not linked yet.
         </div>`;
 
       return;
     }
 
-
-    const permission =
-      await Notification.requestPermission();
-
-
-    if (permission === "granted") {
-
-      box.innerHTML =
-        `<div class="success">
-          Notifications are enabled! 🔔
-          We'll connect the actual schedule alerts next.
-        </div>`;
-
-    } else {
-
-      box.innerHTML =
-        `<div class="notice">
-          Notifications are currently turned off.
-        </div>`;
-
-    }
+    query =
+      query.eq(
+        "assigned_employee_id",
+        mine.id
+      );
   }
 
+  const {
+    data,
+    error
+  } =
+    await query;
 
-  /* =====================================================
-     HELPERS
-  ===================================================== */
+  if (error) {
 
-  function escapeHtml(value) {
+    list.innerHTML =
+      `<div class="card">
+        <strong>Unable to load checklists.</strong>
+        <p class="muted">
+          ${escapeHtml(error.message)}
+        </p>
+      </div>`;
 
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+    return;
   }
 
+  const checklists =
+    data || [];
 
-  /* =====================================================
-     STARTUP
-  ===================================================== */
+  if (!checklists.length) {
 
-  async function checkExistingSession() {
+    list.innerHTML =
+      `<div class="card empty">
+        No checklists yet 🫧
+      </div>`;
 
-    const {
-      data: {
-        session
+    return;
+  }
+
+  list.innerHTML =
+    checklists
+      .map(item => `
+
+        <div class="card checklist-card">
+
+          <div class="team-member">
+
+            <div class="member-avatar">
+
+              ${
+                item.completed
+                  ? "✓"
+                  : "✅"
+              }
+
+            </div>
+
+            <div>
+
+              <div
+                class="checklist-title"
+                style="${
+                  item.completed
+                    ? "text-decoration:line-through;opacity:.6;"
+                    : ""
+                }"
+              >
+                ${escapeHtml(item.title)}
+              </div>
+
+              <div class="muted">
+
+                Assigned to:
+                ${
+                  escapeHtml(
+                    item.team_members?.full_name ||
+                    "Employee"
+                  )
+                }
+
+              </div>
+
+            </div>
+
+          </div>
+
+          ${
+            item.description
+              ? `
+                <div class="checklist-description">
+                  ${escapeHtml(item.description)}
+                </div>
+              `
+              : ""
+          }
+
+          <div class="member-actions">
+
+            ${
+              !item.completed
+                ? `
+                  <button
+                    class="primary-button"
+                    onclick="completeChecklist('${item.id}')"
+                  >
+                    Mark Complete
+                  </button>
+                `
+                : `
+                  <button
+                    class="secondary-button"
+                    disabled
+                  >
+                    Completed ✓
+                  </button>
+                `
+            }
+
+            ${
+              isManager()
+                ? `
+                  <button
+                    class="danger-button"
+                    onclick="deleteChecklist('${item.id}')"
+                  >
+                    Delete
+                  </button>
+                `
+                : ""
+            }
+
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+/* ==============================
+   ADD CHECKLIST
+============================== */
+
+element("saveChecklist")
+  .addEventListener(
+    "click",
+    async function() {
+
+      const title =
+        element("checkTitle")
+          .value
+          .trim();
+
+      const description =
+        element("checkDescription")
+          .value
+          .trim() || null;
+
+      const assigned_employee_id =
+        element("checkEmployee").value;
+
+      const message =
+        element("checkMessage");
+
+      message.textContent = "";
+
+      if (!title || !assigned_employee_id) {
+
+        message.textContent =
+          "Enter a title and choose an employee.";
+
+        return;
       }
-    } =
-      await supabaseClient.auth.getSession();
 
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("checklists")
+          .insert({
+            title,
+            description,
+            assigned_employee_id,
+            assigned_by: currentUser.id
+          });
 
-    if (session?.user) {
+      if (error) {
 
-      currentUser = session.user;
+        message.textContent =
+          error.message;
 
-      await initializeApp();
+        return;
+      }
+
+      message.style.color = "#6d9b7c";
+
+      message.textContent =
+        "Checklist assigned! 🫧";
+
+      element("checkTitle").value = "";
+      element("checkDescription").value = "";
+
+      await loadChecklists();
+
     }
+  );
+
+/* ==============================
+   COMPLETE CHECKLIST
+============================== */
+
+async function completeChecklist(id) {
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("checklists")
+      .update({
+        completed: true,
+        completed_at:
+          new Date().toISOString()
+      })
+      .eq("id", id);
+
+  if (error) {
+
+    alert(error.message);
+    return;
   }
 
+  await loadChecklists();
 
-  supabaseClient.auth.onAuthStateChange(
-    async (event, session) => {
+}
+
+/* ==============================
+   DELETE CHECKLIST
+============================== */
+
+async function deleteChecklist(id) {
+
+  if (
+    !confirm(
+      "Delete this checklist?"
+    )
+  ) {
+    return;
+  }
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("checklists")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    alert(error.message);
+    return;
+  }
+
+  await loadChecklists();
+
+}
+
+/* ==============================
+   DATE / TIME
+============================== */
+
+function formatDate(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  return new Date(
+    value + "T00:00:00"
+  ).toLocaleDateString(
+    undefined,
+    {
+      weekday: "short",
+      month: "short",
+      day: "numeric"
+    }
+  );
+
+}
+
+function formatTime(value) {
+
+  if (!value) {
+    return "—";
+  }
+
+  const parts =
+    value.split(":");
+
+  const date =
+    new Date();
+
+  date.setHours(
+    Number(parts[0]),
+    Number(parts[1]),
+    0,
+    0
+  );
+
+  return date.toLocaleTimeString(
+    [],
+    {
+      hour: "numeric",
+      minute: "2-digit"
+    }
+  );
+
+}
+
+/* ==============================
+   SESSION
+============================== */
+
+async function checkSession() {
+
+  const {
+    data
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+  if (data.session) {
+
+    await showApp(
+      data.session.user
+    );
+
+  }
+
+}
+
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    async function(event, session) {
 
       if (
-        event === "SIGNED_IN" &&
-        session?.user
+        session &&
+        !currentUser
       ) {
 
-        currentUser = session.user;
+        await showApp(
+          session.user
+        );
 
       }
 
     }
   );
 
-
-  checkExistingSession();
+checkSession();
 
 </script>
 
 </body>
 </html>
+```
