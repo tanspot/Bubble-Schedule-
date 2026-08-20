@@ -2246,12 +2246,19 @@ function showView(viewName) {
     });
   }
 
+ if (viewName === "timeOff") {
+
+  await loadTeam();
+
+  populateTimeOffEmployees();
+
   if (
-    viewName === "timeOff" &&
     typeof loadTimeOffRequests === "function"
   ) {
     loadTimeOffRequests();
   }
+
+}
 
   if (viewName === "checklists") {
     loadChecklists();
