@@ -2100,10 +2100,6 @@ function showView(viewName) {
       );
     });
 
-  if (viewName === "home") {
-    loadHome();
-  }
-
   if (viewName === "team") {
     loadTeam();
   }
@@ -2113,17 +2109,16 @@ function showView(viewName) {
   }
 
   if (viewName === "weeklySchedule") {
-
     loadTeam().then(() => {
       loadWeeklySchedule();
     });
-
   }
 
-  if (viewName === "timeOff") {
-
+  if (
+    viewName === "timeOff" &&
+    typeof loadTimeOffRequests === "function"
+  ) {
     loadTimeOffRequests();
-
   }
 
   if (viewName === "checklists") {
@@ -2131,33 +2126,7 @@ function showView(viewName) {
   }
 
 }
-  document
-    .querySelectorAll(".nav-button")
-    .forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.view === viewName
-      );
-    });
 
-  if (viewName === "team") {
-    loadTeam();
-  }
-
-  if (viewName === "schedule") {
-    loadShifts();
-  }
-
- if (viewName === "checklists") {
-  loadChecklists();
-}
-
-if (viewName === "weeklySchedule") {
-  loadTeam().then(() => {
-    loadWeeklySchedule();
-  });
-}
-}
 
 document
   .querySelectorAll("[data-view]")
