@@ -499,6 +499,29 @@ async function loadWeeklySchedule() {
 
   if (!container) return;
 
+  // Make sure we have the employees first
+  const {
+    data: employees,
+    error: employeeError
+  } =
+    await supabaseClient
+      .from("team_members")
+      .select("id, full_name, role, email, user_id")
+      .order("full_name");
+
+  if (employeeError) {
+
+    container.innerHTML =
+      `<div class="notice">
+        ${escapeHtml(employeeError.message)}
+      </div>`;
+
+    return;
+  }
+
+  // Update the global team list
+  teamMembers = employees || [];
+
   const {
     data,
     error
@@ -522,7 +545,6 @@ async function loadWeeklySchedule() {
   renderWeeklySchedule(data || []);
   renderCoworkerSchedule(data || []);
 }
-
 
 function renderWeeklySchedule(schedule) {
 
