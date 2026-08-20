@@ -990,37 +990,73 @@ async function loadTeam() {
 
   list.innerHTML = data.map(member => `
 
-    <div class="card">
+  <div class="card" style="
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+  ">
 
-      <div class="schedule-row">
+    <div style="
+      position:absolute;
+      right:-15px;
+      top:-20px;
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      background:rgba(255,255,255,.45);
+    "></div>
 
-        <div class="day">
-          ${member.role === "manager" ? "👑" : "👤"}
-        </div>
+    <div class="schedule-row">
 
-        <div class="schedule-info">
+      <div style="
+        width:54px;
+        height:54px;
+        border-radius:18px;
+        display:grid;
+        place-items:center;
+        background:linear-gradient(
+          145deg,
+          #ffd6e9,
+          #d8cff9,
+          #c6eafa
+        );
+        font-size:25px;
+        box-shadow:
+          inset 5px 5px 10px rgba(255,255,255,.7),
+          0 7px 15px rgba(150,120,180,.12);
+      ">
+        ${member.role === "manager" ? "👑" : "🫧"}
+      </div>
 
-          <strong>
-            ${member.full_name}
-          </strong>
+      <div class="schedule-info">
 
-          <span>
-            ${member.role === "manager"
-              ? "Manager"
-              : "Employee"}
-          </span>
+        <strong style="font-size:16px;">
+          ${member.full_name}
+        </strong>
 
-        </div>
+        <span>
+          ${member.role === "manager"
+            ? "Manager"
+            : "Employee"}
+        </span>
 
-        <div class="pill">
-          ${member.role}
-        </div>
+      </div>
 
+      <div class="pill" style="
+        background:${
+          member.role === "manager"
+            ? "#eadfff"
+            : "#dff2fb"
+        };
+      ">
+        ${member.role}
       </div>
 
     </div>
 
-  `).join("");
+  </div>
+
+`).join("");
 
 }
 
