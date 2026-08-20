@@ -1,310 +1,981 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BubbleSchedule</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<title>BubbleSchedule</title>
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #eefaff;
-      color: #163b4d;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    header {
-      background: white;
-      padding: 18px 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #d9eef5;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+:root {
+  --pink: #f7c8dc;
+  --pink-dark: #d982ad;
+  --purple: #cfc3f4;
+  --purple-dark: #8874c7;
+  --blue: #bfe4f5;
+  --blue-dark: #619dbb;
+  --text: #554b68;
+  --muted: #958da3;
+  --white: rgba(255,255,255,.86);
+  --shadow: 0 10px 35px rgba(123,105,150,.12);
+}
 
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
-      color: #1596bd;
-    }
+body {
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 10% 15%, #ffddea 0 8%, transparent 9%),
+    radial-gradient(circle at 90% 20%, #d9ceff 0 9%, transparent 10%),
+    linear-gradient(135deg,#fff1f8,#f0edff 48%,#e9f8ff);
+  overflow-x: hidden;
+}
 
-    .bubble {
-      display: inline-block;
-      margin-right: 6px;
-    }
+/* ---------- FLOATING BUBBLES ---------- */
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 25px 18px 50px;
-    }
+.bubble {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: .55;
+  backdrop-filter: blur(2px);
+  border: 2px solid rgba(255,255,255,.8);
+  z-index: 0;
+}
 
-    .welcome {
-      margin-bottom: 22px;
-    }
+.b1 {
+  width: 75px;
+  height: 75px;
+  background: rgba(247,200,220,.45);
+  top: 12%;
+  left: 3%;
+  animation: float 7s infinite ease-in-out;
+}
 
-    .welcome h1 {
-      font-size: 28px;
-      margin-bottom: 6px;
-    }
+.b2 {
+  width: 40px;
+  height: 40px;
+  background: rgba(191,228,245,.55);
+  top: 55%;
+  right: 6%;
+  animation: float 9s infinite ease-in-out reverse;
+}
 
-    .welcome p {
-      color: #6d8792;
-    }
+.b3 {
+  width: 25px;
+  height: 25px;
+  background: rgba(207,195,244,.6);
+  top: 35%;
+  left: 15%;
+  animation: float 6s infinite ease-in-out;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 25px;
-    }
+.b4 {
+  width: 55px;
+  height: 55px;
+  background: rgba(247,200,220,.38);
+  bottom: 15%;
+  left: 4%;
+  animation: float 8s infinite ease-in-out reverse;
+}
 
-    .stat {
-      background: white;
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 5px 20px rgba(30, 130, 160, .08);
-    }
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
+}
 
-    .stat-number {
-      font-size: 27px;
-      font-weight: 800;
-      color: #1596bd;
-    }
+/* ---------- CLOUDS ---------- */
 
-    .stat-label {
-      color: #78919b;
-      font-size: 13px;
-      margin-top: 4px;
-    }
+.cloud {
+  position: fixed;
+  width: 150px;
+  height: 45px;
+  background: rgba(255,255,255,.65);
+  border-radius: 50px;
+  filter: blur(.2px);
+  z-index: 0;
+}
 
-    .section {
-      background: white;
-      border-radius: 22px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 5px 20px rgba(30, 130, 160, .08);
-    }
+.cloud:before,
+.cloud:after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 17px;
-      gap: 10px;
-    }
+.cloud:before {
+  width: 65px;
+  height: 65px;
+  left: 25px;
+  top: -30px;
+}
 
-    .section-header h2 {
-      font-size: 20px;
-    }
+.cloud:after {
+  width: 80px;
+  height: 80px;
+  right: 20px;
+  top: -42px;
+}
 
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 11px 16px;
-      background: #1596bd;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-    }
+.cloud1 {
+  top: 90px;
+  right: -45px;
+  opacity: .65;
+}
 
-    button:hover {
-      opacity: .9;
-    }
+.cloud2 {
+  top: 330px;
+  left: -75px;
+  transform: scale(.7);
+  opacity: .45;
+}
 
-    .schedule {
-      overflow-x: auto;
-    }
+/* ---------- HEADER ---------- */
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 650px;
-    }
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255,255,255,.78);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255,255,255,.8);
+}
 
-    th {
-      text-align: left;
-      font-size: 13px;
-      color: #78919b;
-      padding: 12px 10px;
-      border-bottom: 1px solid #e6f1f4;
-    }
+.header-inner {
+  max-width: 1150px;
+  margin: auto;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    td {
-      padding: 14px 10px;
-      border-bottom: 1px solid #eef4f6;
-      font-size: 14px;
-    }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 22px;
+  font-weight: 850;
+  color: #75629f;
+}
 
-    .shift {
-      background: #e5f8ff;
-      border-radius: 10px;
-      padding: 8px 10px;
-      display: inline-block;
-      color: #167c9d;
-      font-weight: 600;
-    }
+.logo-bubble {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#f8c9df,#cfc3f4,#bfe4f5);
+  box-shadow: 0 5px 15px rgba(140,110,170,.18);
+}
 
-    .employees {
-      display: grid;
-      gap: 10px;
-    }
+.profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f8d4e4;
+  font-weight: 800;
+  color: #8b5e78;
+}
 
-    .employee {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 13px;
-      background: #f5fcff;
-      border-radius: 13px;
-    }
+/* ---------- LAYOUT ---------- */
 
-    .employee-info strong {
-      display: block;
-    }
+.app {
+  position: relative;
+  z-index: 2;
+  max-width: 1150px;
+  margin: auto;
+  padding: 28px 18px 100px;
+}
 
-    .employee-info span {
-      color: #78919b;
-      font-size: 12px;
-    }
+.page {
+  display: none;
+}
 
-    .status {
-      font-size: 12px;
-      background: #e2f8ec;
-      color: #24814b;
-      padding: 6px 9px;
-      border-radius: 20px;
-    }
+.page.active {
+  display: block;
+  animation: appear .3s ease;
+}
 
-    .empty {
-      text-align: center;
-      padding: 35px 15px;
-      color: #78919b;
-    }
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 
-    @media (max-width: 650px) {
-      .stats {
-        grid-template-columns: 1fr;
-      }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-      .welcome h1 {
-        font-size: 24px;
-      }
+/* ---------- WELCOME ---------- */
 
-      .section {
-        padding: 16px;
-      }
-    }
-  </style>
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome small {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.welcome h1 {
+  margin-top: 5px;
+  font-size: clamp(27px,5vw,38px);
+  color: #5d506e;
+}
+
+.welcome p {
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+/* ---------- CARDS ---------- */
+
+.card {
+  background: var(--white);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.85);
+  border-radius: 25px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.stat {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat:nth-child(1) {
+  background: linear-gradient(135deg,#fff,#ffe5ef);
+}
+
+.stat:nth-child(2) {
+  background: linear-gradient(135deg,#fff,#e7e0ff);
+}
+
+.stat:nth-child(3) {
+  background: linear-gradient(135deg,#fff,#def3fb);
+}
+
+.stat-icon {
+  font-size: 23px;
+  margin-bottom: 12px;
+}
+
+.stat-number {
+  font-size: 29px;
+  font-weight: 850;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ---------- SECTION HEADER ---------- */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+}
+
+.section-header p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.primary {
+  border: none;
+  background: linear-gradient(135deg,#d98fb3,#9c89d5);
+  color: white;
+  border-radius: 14px;
+  padding: 11px 15px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(156,137,213,.22);
+}
+
+.primary:active {
+  transform: scale(.97);
+}
+
+/* ---------- SCHEDULE ---------- */
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  gap: 9px;
+}
+
+.day {
+  min-height: 110px;
+  padding: 11px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid #f0eaf3;
+}
+
+.day-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.day-number {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 3px 0 10px;
+}
+
+.shift {
+  padding: 8px;
+  border-radius: 11px;
+  background: linear-gradient(135deg,#f9d7e6,#ded4fa);
+  color: #66577a;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+/* ---------- EMPLOYEES ---------- */
+
+.employee-list {
+  display: grid;
+  gap: 10px;
+}
+
+.employee {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  background: rgba(255,255,255,.68);
+  border-radius: 16px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: linear-gradient(135deg,#f7c8dc,#cfc3f4);
+}
+
+.employee-info {
+  flex: 1;
+}
+
+.employee-info strong {
+  display: block;
+}
+
+.employee-info span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---------- MESSAGES ---------- */
+
+.messages-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 15px;
+}
+
+.message-list {
+  display: grid;
+  gap: 8px;
+}
+
+.message-person {
+  padding: 13px;
+  border-radius: 15px;
+  background: rgba(255,255,255,.65);
+  cursor: pointer;
+}
+
+.message-person.active {
+  background: linear-gradient(135deg,#f8d8e8,#e0d9fa);
+}
+
+.message-person strong {
+  display: block;
+}
+
+.message-person span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.chat {
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 15px;
+}
+
+.msg {
+  max-width: 75%;
+  padding: 11px 14px;
+  border-radius: 17px;
+  font-size: 13px;
+}
+
+.msg.them {
+  align-self: flex-start;
+  background: #f1eafd;
+}
+
+.msg.me {
+  align-self: flex-end;
+  background: linear-gradient(135deg,#f6cadd,#cfc3f4);
+}
+
+.message-input {
+  display: flex;
+  gap: 8px;
+}
+
+.message-input input {
+  flex: 1;
+  border: 1px solid #eadfeb;
+  border-radius: 14px;
+  padding: 12px;
+  outline: none;
+  background: white;
+}
+
+/* ---------- NOTIFICATIONS ---------- */
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 14px;
+  border-radius: 17px;
+  background: rgba(255,255,255,.7);
+  margin-bottom: 10px;
+}
+
+.notification-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #e7ddfa;
+}
+
+/* ---------- BOTTOM NAV ---------- */
+
+.bottom-nav {
+  position: fixed;
+  z-index: 30;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(94%,650px);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 23px;
+  box-shadow: 0 12px 40px rgba(92,72,120,.18);
+}
+
+.nav-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  border-radius: 16px;
+  color: #9a91a6;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.nav-btn span {
+  display: block;
+  font-size: 19px;
+  margin-bottom: 2px;
+}
+
+.nav-btn.active {
+  color: #8a6fc0;
+  background: linear-gradient(135deg,#fce1ed,#e8e0fc);
+}
+
+/* ---------- MODAL ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(69,55,88,.28);
+  backdrop-filter: blur(5px);
+}
+
+.modal.open {
+  display: grid;
+}
+
+.modal-card {
+  width: min(100%,450px);
+  background: white;
+  border-radius: 25px;
+  padding: 23px;
+  box-shadow: 0 20px 70px rgba(70,50,90,.22);
+}
+
+.modal-card h2 {
+  margin-bottom: 15px;
+}
+
+.modal-card input,
+.modal-card select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #e7dff0;
+  border-radius: 13px;
+  margin-bottom: 12px;
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cancel {
+  border: none;
+  background: #f1edf4;
+  color: #71677c;
+  border-radius: 13px;
+  padding: 11px 15px;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media(max-width:700px) {
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .week {
+    grid-template-columns: repeat(5,135px);
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .messages-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .message-list {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .message-person {
+    min-width: 150px;
+  }
+
+  .card {
+    border-radius: 21px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">
-    <span class="bubble">🫧</span> BubbleSchedule
-  </div>
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+<div class="bubble b4"></div>
 
-  <button onclick="alert('Settings coming next!')">
-    Settings
-  </button>
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-bubble">🫧</div>
+      BubbleSchedule
+    </div>
+
+    <div class="profile">A</div>
+  </div>
 </header>
 
-<main class="container">
+<main class="app">
 
-  <div class="welcome">
-    <h1>Good morning 👋</h1>
-    <p>Here's what's happening with your team.</p>
-  </div>
+  <!-- HOME -->
 
-  <div class="stats">
+  <section id="home" class="page active">
 
-    <div class="stat">
-      <div class="stat-number" id="employeeCount">0</div>
-      <div class="stat-label">Employees</div>
+    <div class="welcome">
+      <small>THURSDAY · AUGUST 20</small>
+      <h1>Good morning, Abi 💗</h1>
+      <p>Here's what's happening with your team today.</p>
     </div>
 
-    <div class="stat">
-      <div class="stat-number">0</div>
-      <div class="stat-label">Shifts This Week</div>
+    <div class="stats">
+
+      <div class="card stat">
+        <div class="stat-icon">👩‍💼</div>
+        <div class="stat-number" id="employeeCount">0</div>
+        <div class="stat-label">Team Members</div>
+      </div>
+
+      <div class="card stat">
+        <div class="stat-icon">📅</div>
+        <div class="stat-number">0</div>
+        <div class="stat-label">Shifts This Week</div>
+      </div>
+
+      <div class="card stat">
+        <div class="stat-icon">💌</div>
+        <div class="stat-number">0</div>
+        <div class="stat-label">New Messages</div>
+      </div>
+
     </div>
 
-    <div class="stat">
-      <div class="stat-number">0</div>
-      <div class="stat-label">Time-Off Requests</div>
-    </div>
+    <div class="card">
 
-  </div>
+      <div class="section-header">
+        <div>
+          <h2>This Week ☁️</h2>
+          <p>Your team's schedule</p>
+        </div>
 
-  <section class="section">
+        <button class="primary" onclick="openShiftModal()">
+          + Shift
+        </button>
+      </div>
 
-    <div class="section-header">
-      <h2>Weekly Schedule</h2>
+      <div class="week">
 
-      <button onclick="alert('Shift creator coming next!')">
-        + Add Shift
-      </button>
-    </div>
+        <div class="day">
+          <div class="day-name">Mon</div>
+          <div class="day-number">17</div>
+          <div class="shift">No shifts</div>
+        </div>
 
-    <div class="schedule">
+        <div class="day">
+          <div class="day-name">Tue</div>
+          <div class="day-number">18</div>
+          <div class="shift">No shifts</div>
+        </div>
 
-      <table>
+        <div class="day">
+          <div class="day-name">Wed</div>
+          <div class="day-number">19</div>
+          <div class="shift">No shifts</div>
+        </div>
 
-        <thead>
-          <tr>
-            <th>Employee</th>
-            <th>Mon</th>
-            <th>Tue</th>
-            <th>Wed</th>
-            <th>Thu</th>
-            <th>Fri</th>
-          </tr>
-        </thead>
+        <div class="day">
+          <div class="day-name">Thu</div>
+          <div class="day-number">20</div>
+          <div class="shift">No shifts</div>
+        </div>
 
-        <tbody id="scheduleBody">
+        <div class="day">
+          <div class="day-name">Fri</div>
+          <div class="day-number">21</div>
+          <div class="shift">No shifts</div>
+        </div>
 
-          <tr>
-            <td colspan="6">
-              <div class="empty">
-                No shifts scheduled yet.
-                <br><br>
-                Click <strong>+ Add Shift</strong> to create your first shift.
-              </div>
-            </td>
-          </tr>
-
-        </tbody>
-
-      </table>
+      </div>
 
     </div>
 
   </section>
 
-  <section class="section">
 
-    <div class="section-header">
-      <h2>Employees</h2>
+  <!-- SCHEDULE -->
 
-      <button onclick="addEmployee()">
-        + Add Employee
-      </button>
+  <section id="schedule" class="page">
+
+    <div class="welcome">
+      <small>YOUR TEAM</small>
+      <h1>Schedule 📅</h1>
+      <p>Plan your team's week.</p>
     </div>
 
-    <div class="employees" id="employeeList">
+    <div class="card">
 
-      <div class="empty">
-        No employees added yet.
-        <br>
-        Add your first employee to get started.
+      <div class="section-header">
+        <div>
+          <h2>Weekly Schedule</h2>
+          <p>August 17 – August 21</p>
+        </div>
+
+        <button class="primary" onclick="openShiftModal()">
+          + Add Shift
+        </button>
+      </div>
+
+      <div class="week">
+
+        <div class="day">
+          <div class="day-name">Monday</div>
+          <div class="day-number">17</div>
+          <div class="shift">No shifts</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Tuesday</div>
+          <div class="day-number">18</div>
+          <div class="shift">No shifts</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Wednesday</div>
+          <div class="day-number">19</div>
+          <div class="shift">No shifts</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Thursday</div>
+          <div class="day-number">20</div>
+          <div class="shift">No shifts</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Friday</div>
+          <div class="day-number">21</div>
+          <div class="shift">No shifts</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- MESSAGES -->
+
+  <section id="messages" class="page">
+
+    <div class="welcome">
+      <small>PRIVATE COMMUNICATION</small>
+      <h1>Messages 💌</h1>
+      <p>Private conversations between employees and management.</p>
+    </div>
+
+    <div class="messages-layout">
+
+      <div class="card">
+
+        <div class="section-header">
+          <div>
+            <h2>Conversations</h2>
+          </div>
+        </div>
+
+        <div class="message-list">
+
+          <div class="message-person active">
+            <strong>Management</strong>
+            <span>Private conversation</span>
+          </div>
+
+          <div class="message-person">
+            <strong>Sarah</strong>
+            <span>Employee</span>
+          </div>
+
+          <div class="message-person">
+            <strong>Julie</strong>
+            <span>Employee</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card chat">
+
+        <div class="section-header">
+          <div>
+            <h2>Management 💗</h2>
+            <p>Private conversation</p>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+
+          <div class="msg them">
+            Welcome to BubbleSchedule! 🫧
+          </div>
+
+          <div class="msg them">
+            Private messages will appear here.
+          </div>
+
+        </div>
+
+        <div class="message-input">
+
+          <input
+            id="messageInput"
+            placeholder="Write a private message..."
+          >
+
+          <button class="primary" onclick="sendMessage()">
+            Send
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- TEAM -->
+
+  <section id="team" class="page">
+
+    <div class="welcome">
+      <small>YOUR PEOPLE</small>
+      <h1>Team 👥</h1>
+      <p>Manage your employees.</p>
+    </div>
+
+    <div class="card">
+
+      <div class="section-header">
+
+        <div>
+          <h2>Employees</h2>
+          <p>Your BubbleSchedule team</p>
+        </div>
+
+        <button class="primary" onclick="addEmployee()">
+          + Employee
+        </button>
+
+      </div>
+
+      <div class="employee-list" id="employeeList">
+
+        <div style="text-align:center;padding:30px;color:#958da3;">
+          No employees yet.<br>
+          Add your first team member 💗
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- MORE -->
+
+  <section id="more" class="page">
+
+    <div class="welcome">
+      <small>MORE</small>
+      <h1>More ☁️</h1>
+      <p>Everything else for your team.</p>
+    </div>
+
+    <div class="card">
+
+      <div class="section-header">
+        <div>
+          <h2>Notifications 🔔</h2>
+          <p>Recent BubbleSchedule activity</p>
+        </div>
+      </div>
+
+      <div class="notification">
+
+        <div class="notification-icon">💌</div>
+
+        <div>
+          <strong>Private messaging</strong>
+          <p style="font-size:12px;color:#958da3;">
+            Send private messages to your team.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="notification">
+
+        <div class="notification-icon">📅</div>
+
+        <div>
+          <strong>Schedule updates</strong>
+          <p style="font-size:12px;color:#958da3;">
+            Employees can receive schedule changes.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="notification">
+
+        <div class="notification-icon">🔔</div>
+
+        <div>
+          <strong>Push notifications</strong>
+          <p style="font-size:12px;color:#958da3;">
+            Device notifications will be connected next.
+          </p>
+        </div>
+
       </div>
 
     </div>
@@ -313,58 +984,243 @@
 
 </main>
 
+
+<!-- BOTTOM NAVIGATION -->
+
+<nav class="bottom-nav">
+
+  <button class="nav-btn active" onclick="showPage('home',this)">
+    <span>🏠</span>
+    Home
+  </button>
+
+  <button class="nav-btn" onclick="showPage('schedule',this)">
+    <span>📅</span>
+    Schedule
+  </button>
+
+  <button class="nav-btn" onclick="showPage('messages',this)">
+    <span>💌</span>
+    Messages
+  </button>
+
+  <button class="nav-btn" onclick="showPage('team',this)">
+    <span>👥</span>
+    Team
+  </button>
+
+  <button class="nav-btn" onclick="showPage('more',this)">
+    <span>☁️</span>
+    More
+  </button>
+
+</nav>
+
+
+<!-- SHIFT MODAL -->
+
+<div class="modal" id="shiftModal">
+
+  <div class="modal-card">
+
+    <h2>✨ Create a Shift</h2>
+
+    <input id="shiftEmployee" placeholder="Employee name">
+
+    <input id="shiftDay" placeholder="Day (example: Monday)">
+
+    <input id="shiftTime" placeholder="Time (example: 9 AM – 5 PM)">
+
+    <div class="modal-actions">
+
+      <button class="cancel" onclick="closeShiftModal()">
+        Cancel
+      </button>
+
+      <button class="primary" onclick="createShift()">
+        Create Shift
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 <script>
 
-  let employees = [];
+let employees = [];
 
-  function addEmployee() {
 
-    const name = prompt("Employee name:");
+/* ---------- NAVIGATION ---------- */
 
-    if (!name) return;
+function showPage(page, button) {
 
-    employees.push(name);
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+  });
 
-    renderEmployees();
+  document.getElementById(page).classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(b => {
+    b.classList.remove("active");
+  });
+
+  button.classList.add("active");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* ---------- EMPLOYEES ---------- */
+
+function addEmployee() {
+
+  const name = prompt("What's the employee's name?");
+
+  if (!name) return;
+
+  employees.push(name);
+
+  renderEmployees();
+
+}
+
+
+function renderEmployees() {
+
+  const list = document.getElementById("employeeList");
+
+  document.getElementById("employeeCount").textContent =
+    employees.length;
+
+  if (!employees.length) {
+
+    list.innerHTML = `
+      <div style="text-align:center;padding:30px;color:#958da3;">
+        No employees yet.<br>
+        Add your first team member 💗
+      </div>
+    `;
+
+    return;
 
   }
 
-  function renderEmployees() {
+  list.innerHTML = employees.map(name => {
 
-    const list = document.getElementById("employeeList");
+    const initials = name
+      .split(" ")
+      .map(x => x[0])
+      .join("")
+      .slice(0,2)
+      .toUpperCase();
 
-    document.getElementById("employeeCount").textContent =
-      employees.length;
-
-    if (employees.length === 0) {
-
-      list.innerHTML = `
-        <div class="empty">
-          No employees added yet.
-        </div>
-      `;
-
-      return;
-    }
-
-    list.innerHTML = employees.map(employee => `
+    return `
 
       <div class="employee">
 
-        <div class="employee-info">
-          <strong>${employee}</strong>
-          <span>Employee</span>
+        <div class="avatar">
+          ${initials}
         </div>
 
-        <div class="status">
-          Active
+        <div class="employee-info">
+          <strong>${name}</strong>
+          <span>Employee</span>
         </div>
 
       </div>
 
-    `).join("");
+    `;
+
+  }).join("");
+
+}
+
+
+/* ---------- SHIFT ---------- */
+
+function openShiftModal() {
+
+  document.getElementById("shiftModal")
+    .classList.add("open");
+
+}
+
+function closeShiftModal() {
+
+  document.getElementById("shiftModal")
+    .classList.remove("open");
+
+}
+
+function createShift() {
+
+  const employee =
+    document.getElementById("shiftEmployee").value;
+
+  const day =
+    document.getElementById("shiftDay").value;
+
+  const time =
+    document.getElementById("shiftTime").value;
+
+  if (!employee || !day || !time) {
+
+    alert("Please fill out all fields.");
+
+    return;
 
   }
+
+  alert(
+    "Shift created for " +
+    employee +
+    " on " +
+    day +
+    " from " +
+    time +
+    "."
+  );
+
+  closeShiftModal();
+
+}
+
+
+/* ---------- MESSAGES ---------- */
+
+function sendMessage() {
+
+  const input =
+    document.getElementById("messageInput");
+
+  const message =
+    input.value.trim();
+
+  if (!message) return;
+
+  const chat =
+    document.getElementById("chatMessages");
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className = "msg me";
+
+  bubble.textContent = message;
+
+  chat.appendChild(bubble);
+
+  input.value = "";
+
+  chat.scrollTop = chat.scrollHeight;
+
+}
 
 </script>
 
