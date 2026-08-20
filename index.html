@@ -499,7 +499,11 @@ async function loadWeeklySchedule() {
 
   if (!container) return;
 
-  // Make sure we have the employees first
+  container.innerHTML =
+    `<div class="notice">
+      Loading your team's schedule... 🫧
+    </div>`;
+
   const {
     data: employees,
     error: employeeError
@@ -516,15 +520,29 @@ async function loadWeeklySchedule() {
         ${escapeHtml(employeeError.message)}
       </div>`;
 
+    console.error(
+      "Team loading error:",
+      employeeError
+    );
+
     return;
   }
 
-  // Update the global team list
   teamMembers = employees || [];
 
+  if (!teamMembers.length) {
+
+    container.innerHTML =
+      `<div class="empty">
+        No team members found yet 🫧
+      </div>`;
+
+    return;
+  }
+
   const {
-    data,
-    error
+    data: schedule,
+    error: scheduleError
   } =
     await supabaseClient
       .from("weekly_schedule")
@@ -532,22 +550,24 @@ async function loadWeeklySchedule() {
       .order("employee_id")
       .order("day_of_week");
 
-  if (error) {
+  if (scheduleError) {
 
     container.innerHTML =
       `<div class="notice">
-        ${escapeHtml(error.message)}
+        ${escapeHtml(scheduleError.message)}
       </div>`;
+
+    console.error(
+      "Weekly schedule loading error:",
+      scheduleError
+    );
 
     return;
   }
 
-  renderWeeklySchedule(data || []);
-  renderCoworkerSchedule(data || []);
+  renderWeeklySchedule(schedule || []);
+  renderCoworkerSchedule(schedule || []);
 }
-
-function renderWeeklySchedule(schedule) {
-
   const container =
     element("weeklyScheduleTable");
 
