@@ -3986,6 +3986,54 @@ document
     "click",
     saveWeeklyScheduleData
   );
+  function populateTimeOffEmployees() {
+
+  const employeeSelect =
+    document.getElementById("timeOffEmployee");
+
+  const switchSelect =
+    document.getElementById("timeOffSwitchEmployee");
+
+  if (!employeeSelect || !switchSelect) {
+    return;
+  }
+
+  const employees =
+    teamMembers || [];
+
+  employeeSelect.innerHTML = `
+    <option value="">
+      Select employee
+    </option>
+  `;
+
+  switchSelect.innerHTML = `
+    <option value="">
+      No — I don't need a switch
+    </option>
+  `;
+
+  employees.forEach(employee => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = employee.id;
+    option.textContent = employee.full_name;
+
+    employeeSelect.appendChild(option);
+
+    const switchOption =
+      document.createElement("option");
+
+    switchOption.value = employee.id;
+    switchOption.textContent = employee.full_name;
+
+    switchSelect.appendChild(switchOption);
+
+  });
+
+}
   /* ==============================
    TIME OFF REQUESTS
 ============================== */
