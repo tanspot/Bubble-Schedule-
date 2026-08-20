@@ -2478,6 +2478,7 @@ async function loadTeam() {
   }
 
   teamMembers = data || [];
+  populateTimeOffEmployees();
 
   element("teamStat").textContent =
     teamMembers.length;
