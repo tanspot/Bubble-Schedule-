@@ -1966,14 +1966,14 @@ function showView(viewName) {
     loadShifts();
   }
 
-  if (viewName === "checklists") {
-    loadChecklists();
-    if (viewName === "weeklySchedule") {
-  loadWeeklySchedule();
+ if (viewName === "checklists") {
+  loadChecklists();
 }
-  }
+
 if (viewName === "weeklySchedule") {
-  loadWeeklySchedule();
+  loadTeam().then(() => {
+    loadWeeklySchedule();
+  });
 }
 }
 
