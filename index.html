@@ -3995,7 +3995,7 @@ document
     "click",
     saveWeeklyScheduleData
   );
-  function populateTimeOffEmployees() {
+ async function populateTimeOffEmployees() {
 
   const employeeSelect =
     document.getElementById("timeOffEmployee");
@@ -4007,8 +4007,65 @@ document
     return;
   }
 
-  const employees =
-    teamMembers || [];
+  employeeSelect.innerHTML = `
+    <option value="">
+      Loading employees...
+    </option>
+  `;
+
+  switchSelect.innerHTML = `
+    <option value="">
+      Loading employees...
+    </option>
+  `;
+
+  const {
+    data: employees,
+    error
+  } =
+    await supabaseClient
+      .from("team_members")
+      .select("id, full_name")
+      .order("full_name");
+
+  if (error) {
+
+    console.error(
+      "Time Off employee loading error:",
+      error
+    );
+
+    employeeSelect.innerHTML = `
+      <option value="">
+        Unable to load employees
+      </option>
+    `;
+
+    switchSelect.innerHTML = `
+      <option value="">
+        Unable to load employees
+      </option>
+    `;
+
+    return;
+  }
+
+  if (!employees || employees.length === 0) {
+
+    employeeSelect.innerHTML = `
+      <option value="">
+        No employees
+      </option>
+    `;
+
+    switchSelect.innerHTML = `
+      <option value="">
+        No employees
+      </option>
+    `;
+
+    return;
+  }
 
   employeeSelect.innerHTML = `
     <option value="">
@@ -4022,23 +4079,33 @@ document
     </option>
   `;
 
-  employees.forEach(employee => {
+  employees.forEach(function(employee) {
 
-    const option =
+    const employeeOption =
       document.createElement("option");
 
-    option.value = employee.id;
-    option.textContent = employee.full_name;
+    employeeOption.value =
+      employee.id;
 
-    employeeSelect.appendChild(option);
+    employeeOption.textContent =
+      employee.full_name;
+
+    employeeSelect.appendChild(
+      employeeOption
+    );
 
     const switchOption =
       document.createElement("option");
 
-    switchOption.value = employee.id;
-    switchOption.textContent = employee.full_name;
+    switchOption.value =
+      employee.id;
 
-    switchSelect.appendChild(switchOption);
+    switchOption.textContent =
+      employee.full_name;
+
+    switchSelect.appendChild(
+      switchOption
+    );
 
   });
 
