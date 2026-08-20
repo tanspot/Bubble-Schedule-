@@ -2,33 +2,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
 <title>Bubble Schedule</title>
 
-<!-- iPhone / App Settings -->
+<meta name="theme-color" content="#d9c7ff">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Bubble Schedule">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#d9c7ff">
 
-<!-- Bubble Schedule PWA -->
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="bubble-schedule-icon.png">
 
-<!-- Browser Favicon -->
 <link
   rel="icon"
-  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffd3e8'/%3E%3Cstop offset='.5' stop-color='%23d8cff9'/%3E%3Cstop offset='1' stop-color='%23c7edff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='110' fill='url(%23g)'/%3E%3Ccircle cx='210' cy='270' r='125' fill='white' fill-opacity='.8'/%3E%3Ccircle cx='330' cy='175' r='70' fill='white' fill-opacity='.65'/%3E%3Ccircle cx='115' cy='155' r='45' fill='white' fill-opacity='.7'/%3E%3Cpath d='M382 82l10 27 27 10-27 10-10 27-10-27-27-10 27-10z' fill='white'/%3E%3Cpath d='M390 275l7 19 19 7-19 7-7 19-7-19-19-7 19-7z' fill='white'/%3E%3C/svg%3E"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffd3e8'/%3E%3Cstop offset='.5' stop-color='%23d8cff9'/%3E%3Cstop offset='1' stop-color='%23c7edff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='110' fill='url(%23g)'/%3E%3Ccircle cx='210' cy='270' r='125' fill='white' fill-opacity='.8'/%3E%3Ccircle cx='330' cy='175' r='70' fill='white' fill-opacity='.65'/%3E%3Ccircle cx='115' cy='155' r='45' fill='white' fill-opacity='.7'/%3E%3Cpath d='M382 82l10 27 27 10-27 10-10 27-10-27-27-10 27-10z' fill='white'/%3E%3C/svg%3E"
 >
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -40,10 +41,10 @@ html {
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  color: #40384a;
   min-height: 100vh;
   min-height: 100dvh;
+  font-family: Arial, sans-serif;
+  color: #40384a;
 
   background:
     radial-gradient(circle at 8% 8%, #ffd9ec, transparent 30%),
@@ -176,7 +177,6 @@ h3 {
 
   color: white;
   font-weight: 800;
-
   box-shadow: 0 10px 25px rgba(150,120,180,.2);
 }
 
@@ -362,7 +362,7 @@ h3 {
   font-size: 13px;
 }
 
-/* PAGE HEADERS */
+/* HEADERS */
 
 .page-header {
   display: flex;
@@ -515,7 +515,9 @@ h3 {
   -webkit-backdrop-filter: blur(15px);
 
   border-radius: 23px;
-  box-shadow: 0 12px 35px rgba(100,80,120,.18);
+
+  box-shadow:
+    0 12px 35px rgba(100,80,120,.18);
 
   z-index: 20;
 }
@@ -552,9 +554,10 @@ h3 {
   font-size: 13px;
 }
 
-/* IPHONE */
+/* MOBILE */
 
 @media (max-width: 500px) {
+
   .grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -576,9 +579,8 @@ h3 {
   }
 }
 
-/* SMALL PHONES */
-
 @media (max-width: 360px) {
+
   .container {
     width: calc(100% - 20px);
   }
@@ -603,6 +605,7 @@ h3 {
     padding: 8px 10px;
   }
 }
+
 </style>
 </head>
 
@@ -611,9 +614,12 @@ h3 {
 <!-- LOGIN -->
 
 <div id="loginScreen">
+
   <div class="login-card">
 
-    <div class="bubble-logo">🫧</div>
+    <div class="bubble-logo">
+      🫧
+    </div>
 
     <h1>Bubble Schedule</h1>
 
@@ -624,7 +630,9 @@ h3 {
     <form id="loginForm">
 
       <div class="input-group">
+
         <label>Email</label>
+
         <input
           id="email"
           type="email"
@@ -632,10 +640,13 @@ h3 {
           autocomplete="email"
           required
         >
+
       </div>
 
       <div class="input-group">
+
         <label>Password</label>
+
         <input
           id="password"
           type="password"
@@ -643,16 +654,25 @@ h3 {
           autocomplete="current-password"
           required
         >
+
       </div>
 
-      <button class="primary-button" type="submit">
+      <button
+        class="primary-button"
+        type="submit"
+      >
         Log In 🫧
       </button>
 
-      <div id="loginError" class="error"></div>
+      <div
+        id="loginError"
+        class="error"
+      ></div>
 
     </form>
+
   </div>
+
 </div>
 
 <!-- APP -->
@@ -663,7 +683,9 @@ h3 {
 
     <div class="brand">
 
-      <div class="small-bubble">🫧</div>
+      <div class="small-bubble">
+        🫧
+      </div>
 
       <div>
         <strong>Bubble Schedule</strong>
@@ -672,7 +694,10 @@ h3 {
 
     </div>
 
-    <button id="logoutButton" class="logout-button">
+    <button
+      id="logoutButton"
+      class="logout-button"
+    >
       Log Out
     </button>
 
@@ -682,56 +707,100 @@ h3 {
 
     <!-- HOME -->
 
-    <section id="homeView" class="view active">
+    <section
+      id="homeView"
+      class="view active"
+    >
 
       <div class="hero">
 
-        <h2 id="welcome">Welcome!</h2>
+        <h2 id="welcome">
+          Welcome!
+        </h2>
 
         <p>
           Keep your team organized and your schedule running smoothly.
         </p>
 
-        <div id="roleDisplay" class="role-pill"></div>
+        <div
+          id="roleDisplay"
+          class="role-pill"
+        ></div>
 
       </div>
 
-      <div class="section-title">Overview</div>
+      <div class="section-title">
+        Overview
+      </div>
 
       <div class="grid">
 
         <div class="card">
-          <div id="teamStat" class="stat-number">0</div>
-          <div class="stat-label">Team Members</div>
+
+          <div
+            id="teamStat"
+            class="stat-number"
+          >
+            0
+          </div>
+
+          <div class="stat-label">
+            Team Members
+          </div>
+
         </div>
 
         <div class="card">
-          <div id="todayStat" class="stat-number">0</div>
-          <div class="stat-label">Scheduled Today</div>
+
+          <div
+            id="todayStat"
+            class="stat-number"
+          >
+            0
+          </div>
+
+          <div class="stat-label">
+            Scheduled Today
+          </div>
+
         </div>
 
       </div>
 
-      <div class="section-title">Quick Actions</div>
+      <div class="section-title">
+        Quick Actions
+      </div>
 
       <div class="grid">
 
-        <button class="quick-button" data-view="schedule">
+        <button
+          class="quick-button"
+          data-view="schedule"
+        >
           <strong>📅 Schedule</strong>
           <span>View your team's schedule</span>
         </button>
 
-        <button class="quick-button" data-view="team">
+        <button
+          class="quick-button"
+          data-view="team"
+        >
           <strong>👥 Manage Team</strong>
           <span>Add employees and send invitations</span>
         </button>
 
-        <button class="quick-button" data-view="notes">
+        <button
+          class="quick-button"
+          data-view="notes"
+        >
           <strong>💌 Private Notes</strong>
           <span>Private messages between team members</span>
         </button>
 
-        <button class="quick-button" data-view="checklists">
+        <button
+          class="quick-button"
+          data-view="checklists"
+        >
           <strong>✅ Checklists</strong>
           <span>Assign and track tasks</span>
         </button>
@@ -742,11 +811,19 @@ h3 {
 
     <!-- SCHEDULE -->
 
-    <section id="scheduleView" class="view">
+    <section
+      id="scheduleView"
+      class="view"
+    >
 
       <div class="page-header">
 
-        <button class="back-button" data-view="home">←</button>
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
         <div>
           <h2>Schedule</h2>
@@ -755,51 +832,86 @@ h3 {
 
       </div>
 
-      <div id="managerShiftForm" class="card hidden">
+      <div
+        id="managerShiftForm"
+        class="card hidden"
+      >
 
         <h3>Add Shift</h3>
 
         <div class="input-group">
+
           <label>Employee</label>
+
           <select id="shiftEmployee"></select>
+
         </div>
 
         <div class="input-group">
+
           <label>Date</label>
-          <input id="shiftDate" type="date">
+
+          <input
+            id="shiftDate"
+            type="date"
+          >
+
         </div>
 
         <div class="grid">
 
           <div class="input-group">
+
             <label>Start</label>
-            <input id="shiftStart" type="time">
+
+            <input
+              id="shiftStart"
+              type="time"
+            >
+
           </div>
 
           <div class="input-group">
+
             <label>End</label>
-            <input id="shiftEnd" type="time">
+
+            <input
+              id="shiftEnd"
+              type="time"
+            >
+
           </div>
 
         </div>
 
         <div class="input-group">
+
           <label>Notes</label>
+
           <textarea
             id="shiftNotes"
             placeholder="Optional notes"
           ></textarea>
+
         </div>
 
-        <button id="saveShift" class="primary-button">
+        <button
+          id="saveShift"
+          class="primary-button"
+        >
           Add Shift
         </button>
 
-        <div id="shiftMessage" class="error"></div>
+        <div
+          id="shiftMessage"
+          class="error"
+        ></div>
 
       </div>
 
-      <div class="section-title">Upcoming Shifts</div>
+      <div class="section-title">
+        Upcoming Shifts
+      </div>
 
       <div id="shiftList"></div>
 
@@ -807,20 +919,39 @@ h3 {
 
     <!-- TEAM -->
 
-    <section id="teamView" class="view">
+    <section
+      id="teamView"
+      class="view"
+    >
 
       <div class="page-header">
 
-        <button class="back-button" data-view="home">←</button>
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
         <div>
+
           <h2>Your Team</h2>
-          <div id="teamCount" class="muted">0 members</div>
+
+          <div
+            id="teamCount"
+            class="muted"
+          >
+            0 members
+          </div>
+
         </div>
 
       </div>
 
-      <div id="managerTeamArea" class="card hidden">
+      <div
+        id="managerTeamArea"
+        class="card hidden"
+      >
 
         <h3>Add Team Member</h3>
 
@@ -831,58 +962,96 @@ h3 {
         </div>
 
         <div class="input-group">
+
           <label>Employee Name</label>
+
           <input
             id="newTeamName"
             type="text"
             placeholder="Employee name"
           >
+
         </div>
 
         <div class="input-group">
+
           <label>Employee Email</label>
+
           <input
             id="newTeamEmail"
             type="email"
             placeholder="employee@email.com"
           >
+
         </div>
 
         <div class="input-group">
+
           <label>Role</label>
 
           <select id="newTeamRole">
-            <option value="employee">Employee</option>
-            <option value="manager">Manager</option>
+
+            <option value="employee">
+              Employee
+            </option>
+
+            <option value="manager">
+              Manager
+            </option>
+
           </select>
 
         </div>
 
-        <button id="saveTeamMember" class="primary-button">
+        <button
+          id="saveTeamMember"
+          class="primary-button"
+        >
           Add Employee 🫧
         </button>
 
-        <div id="teamFormMessage" class="error"></div>
+        <div
+          id="teamFormMessage"
+          class="error"
+        ></div>
 
       </div>
 
-      <div class="section-title">Team Members</div>
+      <div class="section-title">
+        Team Members
+      </div>
 
-      <div id="teamList" class="team-list"></div>
+      <div
+        id="teamList"
+        class="team-list"
+      ></div>
 
     </section>
 
     <!-- NOTES -->
 
-    <section id="notesView" class="view">
+    <section
+      id="notesView"
+      class="view"
+    >
 
       <div class="page-header">
 
-        <button class="back-button" data-view="home">←</button>
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
         <div>
+
           <h2>Private Notes</h2>
-          <div class="muted">Private team communication</div>
+
+          <div class="muted">
+            Private team communication
+          </div>
+
         </div>
 
       </div>
@@ -894,7 +1063,10 @@ h3 {
           sender and recipient can see them.
         </div>
 
-        <div id="notesList" class="empty">
+        <div
+          id="notesList"
+          class="empty"
+        >
           No notes yet 🫧
         </div>
 
@@ -904,53 +1076,86 @@ h3 {
 
     <!-- CHECKLISTS -->
 
-    <section id="checklistsView" class="view">
+    <section
+      id="checklistsView"
+      class="view"
+    >
 
       <div class="page-header">
 
-        <button class="back-button" data-view="home">←</button>
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
         <div>
+
           <h2>Checklists</h2>
-          <div class="muted">Tasks for your team</div>
+
+          <div class="muted">
+            Tasks for your team
+          </div>
+
         </div>
 
       </div>
 
-      <div id="managerChecklistForm" class="card hidden">
+      <div
+        id="managerChecklistForm"
+        class="card hidden"
+      >
 
         <h3>Assign Checklist</h3>
 
         <div class="input-group">
+
           <label>Title</label>
+
           <input
             id="checkTitle"
             placeholder="Example: Closing checklist"
           >
+
         </div>
 
         <div class="input-group">
+
           <label>Description</label>
+
           <textarea
             id="checkDescription"
             placeholder="What needs to be done?"
           ></textarea>
+
         </div>
 
         <div class="input-group">
+
           <label>Assign To</label>
+
           <select id="checkEmployee"></select>
+
         </div>
 
-        <button id="saveChecklist" class="primary-button">
+        <button
+          id="saveChecklist"
+          class="primary-button"
+        >
           Assign Checklist
         </button>
 
-        <div id="checkMessage" class="error"></div>
+        <div
+          id="checkMessage"
+          class="error"
+        ></div>
 
       </div>
 
-      <div class="section-title">My Checklists</div>
+      <div class="section-title">
+        My Checklists
+      </div>
 
       <div id="checklistList"></div>
 
@@ -958,28 +1163,47 @@ h3 {
 
     <!-- SETTINGS -->
 
-    <section id="settingsView" class="view">
+    <section
+      id="settingsView"
+      class="view"
+    >
 
       <div class="page-header">
 
-        <button class="back-button" data-view="home">←</button>
+        <button
+          class="back-button"
+          data-view="home"
+        >
+          ←
+        </button>
 
         <div>
+
           <h2>Settings</h2>
+
           <div class="muted">
             Your Bubble Schedule account
           </div>
+
         </div>
 
       </div>
 
       <div class="card">
 
-        <h3 id="settingsName">Account</h3>
+        <h3 id="settingsName">
+          Account
+        </h3>
 
-        <p id="settingsEmail" class="muted"></p>
+        <p
+          id="settingsEmail"
+          class="muted"
+        ></p>
 
-        <div id="settingsRole" class="role-pill"></div>
+        <div
+          id="settingsRole"
+          class="role-pill"
+        ></div>
 
         <br><br>
 
@@ -1001,22 +1225,34 @@ h3 {
 
   <nav class="bottom-nav">
 
-    <button class="nav-button active" data-view="home">
+    <button
+      class="nav-button active"
+      data-view="home"
+    >
       <span class="nav-icon">🏠</span>
       Home
     </button>
 
-    <button class="nav-button" data-view="schedule">
+    <button
+      class="nav-button"
+      data-view="schedule"
+    >
       <span class="nav-icon">📅</span>
       Schedule
     </button>
 
-    <button class="nav-button" data-view="team">
+    <button
+      class="nav-button"
+      data-view="team"
+    >
       <span class="nav-icon">👥</span>
       Team
     </button>
 
-    <button class="nav-button" data-view="settings">
+    <button
+      class="nav-button"
+      data-view="settings"
+    >
       <span class="nav-icon">⚙️</span>
       Settings
     </button>
@@ -1027,7 +1263,9 @@ h3 {
 
 <script>
 
-/* SUPABASE */
+/* ==============================
+   SUPABASE
+============================== */
 
 const SUPABASE_URL =
   "https://sflhmsbqlrgkcukwcewj.supabase.co";
@@ -1041,19 +1279,39 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
-/* GLOBAL STATE */
+/* ==============================
+   STATE
+============================== */
 
 let currentUser = null;
 let currentProfile = null;
 let teamMembers = [];
 
-/* HELPER */
+/* ==============================
+   HELPERS
+============================== */
 
 function element(id) {
   return document.getElementById(id);
 }
 
+function escapeHtml(value) {
+
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[character])
+  );
+
+}
+
 function isManager() {
+
   return (
     currentProfile &&
     (
@@ -1061,9 +1319,12 @@ function isManager() {
       currentProfile.role === "manager"
     )
   );
+
 }
 
-/* NAVIGATION */
+/* ==============================
+   NAVIGATION
+============================== */
 
 function showView(viewName) {
 
@@ -1100,6 +1361,7 @@ function showView(viewName) {
   if (viewName === "checklists") {
     loadChecklists();
   }
+
 }
 
 document
@@ -1115,7 +1377,52 @@ document
 
   });
 
-/* SHOW APP */
+/* ==============================
+   LOGIN
+============================== */
+
+element("loginForm")
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+      element("loginError").textContent = "";
+
+      const email =
+        element("email").value.trim();
+
+      const password =
+        element("password").value;
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .auth
+          .signInWithPassword({
+            email,
+            password
+          });
+
+      if (error) {
+
+        element("loginError").textContent =
+          error.message;
+
+        return;
+      }
+
+      await showApp(data.user);
+
+    }
+  );
+
+/* ==============================
+   SHOW APP
+============================== */
 
 async function showApp(user) {
 
@@ -1184,84 +1491,52 @@ async function showApp(user) {
 
     element("managerChecklistForm")
       .classList.add("hidden");
+
   }
 
   await loadTeam();
   await loadShifts();
   await loadChecklists();
+
 }
 
-/* LOGIN */
-
-element("loginForm")
-  .addEventListener(
-    "submit",
-    async function(event) {
-
-      event.preventDefault();
-
-      element("loginError").textContent = "";
-
-      const email =
-        element("email").value.trim();
-
-      const password =
-        element("password").value;
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient
-          .auth
-          .signInWithPassword({
-            email,
-            password
-          });
-
-      if (error) {
-
-        element("loginError")
-          .textContent =
-          error.message;
-
-        return;
-      }
-
-      await showApp(data.user);
-    }
-  );
-
-/* LOGOUT */
+/* ==============================
+   LOGOUT
+============================== */
 
 async function logout() {
 
-  await supabaseClient
-    .auth
-    .signOut();
+  await supabaseClient.auth.signOut();
 
   currentUser = null;
   currentProfile = null;
+  teamMembers = [];
 
-  element("app")
-    .classList.add("hidden");
+  element("app").classList.add("hidden");
 
-  element("loginScreen")
-    .style.display = "flex";
+  element("loginScreen").style.display = "flex";
 
-  element("loginForm")
-    .reset();
+  element("loginForm").reset();
 
   showView("home");
+
 }
 
 element("logoutButton")
-  .addEventListener("click", logout);
+  .addEventListener(
+    "click",
+    logout
+  );
 
 element("settingsLogout")
-  .addEventListener("click", logout);
+  .addEventListener(
+    "click",
+    logout
+  );
 
-/* LOAD TEAM */
+/* ==============================
+   LOAD TEAM
+============================== */
 
 async function loadTeam() {
 
@@ -1279,7 +1554,9 @@ async function loadTeam() {
   } =
     await supabaseClient
       .from("team_members")
-      .select("id, full_name, role, email, user_id")
+      .select(
+        "id, full_name, role, email, user_id"
+      )
       .order("full_name");
 
   if (error) {
@@ -1344,6 +1621,7 @@ async function loadTeam() {
 
               <span>
                 ${escapeHtml(member.role)}
+
                 ${
                   member.email
                     ? " · " +
@@ -1392,16 +1670,21 @@ async function loadTeam() {
                   </button>
 
                 </div>
+
               `
               : ""
           }
 
         </div>
+
       `)
       .join("");
+
 }
 
-/* EMPLOYEE SELECTS */
+/* ==============================
+   EMPLOYEE SELECTS
+============================== */
 
 function populateEmployeeSelects() {
 
@@ -1421,9 +1704,12 @@ function populateEmployeeSelects() {
   element("checkEmployee").innerHTML =
     options ||
     `<option value="">No employees</option>`;
+
 }
 
-/* ADD TEAM MEMBER */
+/* ==============================
+   ADD TEAM MEMBER
+============================== */
 
 element("saveTeamMember")
   .addEventListener(
@@ -1505,10 +1791,13 @@ element("saveTeamMember")
           name +
           " was added successfully! 🫧";
       }
+
     }
   );
 
-/* INVITE EMPLOYEE */
+/* ==============================
+   INVITE EMPLOYEE
+============================== */
 
 async function inviteEmployee(teamMemberId) {
 
@@ -1588,9 +1877,12 @@ async function inviteEmployee(teamMemberId) {
   );
 
   await loadTeam();
+
 }
 
-/* REMOVE TEAM MEMBER */
+/* ==============================
+   REMOVE TEAM MEMBER
+============================== */
 
 async function removeTeamMember(id) {
 
@@ -1621,9 +1913,12 @@ async function removeTeamMember(id) {
   }
 
   await loadTeam();
+
 }
 
-/* LOAD SHIFTS */
+/* ==============================
+   LOAD SHIFTS
+============================== */
 
 async function loadShifts() {
 
@@ -1658,8 +1953,7 @@ async function loadShifts() {
     const mine =
       teamMembers.find(
         member =>
-          member.user_id ===
-          currentUser.id
+          member.user_id === currentUser.id
       );
 
     if (!mine) {
@@ -1736,24 +2030,29 @@ async function loadShifts() {
             </div>
 
             <div class="shift-time">
+
               ${formatTime(shift.start_time)}
+
               ${
                 shift.end_time
                   ? " – " +
                     formatTime(shift.end_time)
                   : ""
               }
+
             </div>
 
           </div>
 
           <div class="shift-employee">
+
             ${
               escapeHtml(
                 shift.team_members?.full_name ||
                 "Employee"
               )
             }
+
           </div>
 
           ${
@@ -1784,11 +2083,15 @@ async function loadShifts() {
           }
 
         </div>
+
       `)
       .join("");
+
 }
 
-/* ADD SHIFT */
+/* ==============================
+   ADD SHIFT
+============================== */
 
 element("saveShift")
   .addEventListener(
@@ -1855,10 +2158,13 @@ element("saveShift")
       element("shiftNotes").value = "";
 
       await loadShifts();
+
     }
   );
 
-/* DELETE SHIFT */
+/* ==============================
+   DELETE SHIFT
+============================== */
 
 async function deleteShift(id) {
 
@@ -1885,9 +2191,12 @@ async function deleteShift(id) {
   }
 
   await loadShifts();
+
 }
 
-/* CHECKLISTS */
+/* ==============================
+   CHECKLISTS
+============================== */
 
 async function loadChecklists() {
 
@@ -1919,8 +2228,7 @@ async function loadChecklists() {
     const mine =
       teamMembers.find(
         member =>
-          member.user_id ===
-          currentUser.id
+          member.user_id === currentUser.id
       );
 
     if (!mine) {
@@ -1981,11 +2289,13 @@ async function loadChecklists() {
           <div class="team-member">
 
             <div class="member-avatar">
+
               ${
                 item.completed
                   ? "✓"
                   : "✅"
               }
+
             </div>
 
             <div>
@@ -2002,6 +2312,7 @@ async function loadChecklists() {
               </div>
 
               <div class="muted">
+
                 Assigned to:
                 ${
                   escapeHtml(
@@ -2009,6 +2320,7 @@ async function loadChecklists() {
                     "Employee"
                   )
                 }
+
               </div>
 
             </div>
@@ -2063,11 +2375,15 @@ async function loadChecklists() {
           </div>
 
         </div>
+
       `)
       .join("");
+
 }
 
-/* ADD CHECKLIST */
+/* ==============================
+   ADD CHECKLIST
+============================== */
 
 element("saveChecklist")
   .addEventListener(
@@ -2121,6 +2437,7 @@ element("saveChecklist")
       }
 
       message.style.color = "#6d9b7c";
+
       message.textContent =
         "Checklist assigned! 🫧";
 
@@ -2128,10 +2445,13 @@ element("saveChecklist")
       element("checkDescription").value = "";
 
       await loadChecklists();
+
     }
   );
 
-/* COMPLETE CHECKLIST */
+/* ==============================
+   COMPLETE CHECKLIST
+============================== */
 
 async function completeChecklist(id) {
 
@@ -2154,9 +2474,12 @@ async function completeChecklist(id) {
   }
 
   await loadChecklists();
+
 }
 
-/* DELETE CHECKLIST */
+/* ==============================
+   DELETE CHECKLIST
+============================== */
 
 async function deleteChecklist(id) {
 
@@ -2183,9 +2506,12 @@ async function deleteChecklist(id) {
   }
 
   await loadChecklists();
+
 }
 
-/* DATE */
+/* ==============================
+   DATE / TIME
+============================== */
 
 function formatDate(value) {
 
@@ -2195,18 +2521,16 @@ function formatDate(value) {
 
   return new Date(
     value + "T00:00:00"
-  )
-    .toLocaleDateString(
-      undefined,
-      {
-        weekday: "short",
-        month: "short",
-        day: "numeric"
-      }
-    );
-}
+  ).toLocaleDateString(
+    undefined,
+    {
+      weekday: "short",
+      month: "short",
+      day: "numeric"
+    }
+  );
 
-/* TIME */
+}
 
 function formatTime(value) {
 
@@ -2234,27 +2558,12 @@ function formatTime(value) {
       minute: "2-digit"
     }
   );
+
 }
 
-/* SECURITY */
-
-function escapeHtml(value) {
-
-  return String(
-    value ?? ""
-  ).replace(
-    /[&<>"']/g,
-    character => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[character])
-  );
-}
-
-/* SESSION */
+/* ==============================
+   SESSION
+============================== */
 
 async function checkSession() {
 
@@ -2270,7 +2579,9 @@ async function checkSession() {
     await showApp(
       data.session.user
     );
+
   }
+
 }
 
 supabaseClient
@@ -2286,7 +2597,9 @@ supabaseClient
         await showApp(
           session.user
         );
+
       }
+
     }
   );
 
