@@ -852,10 +852,10 @@ loginForm.addEventListener("submit", async function(event) {
     });
 
   if (error) {
-    loginError.textContent =
-      error.message;
-    return;
-  }
+  alert("LOGIN ERROR: " + error.message);
+  loginError.textContent = error.message;
+  return;
+}
 
   await showApp(data.user);
 
