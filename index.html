@@ -1105,3 +1105,21 @@ document.getElementById("saveTeamMember")
 
 </body>
 </html>
+async function removeTeamMember(id) {
+
+  if (!confirm("Remove this team member?")) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("team_members")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  await loadTeam();
+}
