@@ -4259,6 +4259,63 @@ document
     "click",
     submitTimeOffRequest
   );
+  document
+  .getElementById("forgotPassword")
+  ?.addEventListener(
+    "click",
+    async function() {
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+      const message =
+        document.getElementById(
+          "forgotPasswordMessage"
+        );
+
+      message.textContent = "";
+
+      if (!email) {
+
+        message.textContent =
+          "Enter your email address first.";
+
+        return;
+      }
+
+      const {
+        error
+      } =
+        await supabaseClient.auth
+          .resetPasswordForEmail(
+            email,
+            {
+              redirectTo:
+                "https://bubble-schedule.vercel.app/"
+            }
+          );
+
+      if (error) {
+
+        message.textContent =
+          error.message;
+
+        console.error(
+          "Password reset error:",
+          error
+        );
+
+        return;
+      }
+
+      message.textContent =
+        "Password reset email sent! 🫧 Check your email.";
+
+    }
+  );
 </script>
 
 </body>
