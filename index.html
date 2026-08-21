@@ -4309,6 +4309,37 @@ document
 
     }
   );
+  <script>
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener(
+    "load",
+    function() {
+
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then(function(registration) {
+
+          console.log(
+            "Bubble Schedule notification service worker registered.",
+            registration
+          );
+
+        })
+        .catch(function(error) {
+
+          console.error(
+            "Notification service worker registration failed:",
+            error
+          );
+
+        });
+
+    }
+  );
+
+}
+</script>
 </script>
 
 </body>
