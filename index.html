@@ -2339,7 +2339,12 @@ element("loginForm")
         return;
       }
 
-      await showApp(data.user);
+        await showApp(data.user);
+
+      // Ask this device to enable Bubble Schedule notifications
+      setTimeout(function() {
+        enablePushNotifications();
+      }, 1000);
 
     }
   );
