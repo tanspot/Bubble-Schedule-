@@ -4324,8 +4324,9 @@ document
     }
   );
 window.BUBBLE_VAPID_PUBLIC_KEY =
-  "BOiqaGH2F7JdFUMY1wDl7M82tVllEx6v9V7iShJfuCg-attYWHVu1bQ8z3D7PjlY5ZU5hfsyKG-rkKsOMbFDoBc";
-  /* ==============================
+  "BLN4h8jqvIZRLm9pXT7TKOYS_UixIGKb9KrOVuc9C-iBfGkZ6a3DZ60UD1SwgW1z4STdjeEpfMHuv5P4yF7Ii0c";
+
+/* ==============================
    PUSH NOTIFICATIONS
 ============================== */
 
@@ -4359,50 +4360,73 @@ function urlBase64ToUint8Array(base64String) {
 async function enablePushNotifications() {
 
   if (!("Notification" in window)) {
+
     console.log(
       "This browser does not support notifications."
     );
+
     return;
+
   }
 
+
   if (!("serviceWorker" in navigator)) {
+
     console.log(
       "This browser does not support service workers."
     );
+
     return;
+
   }
 
+
   if (!("PushManager" in window)) {
+
     console.log(
       "This browser does not support push notifications."
     );
+
     return;
+
   }
 
+
   if (!currentUser) {
+
     console.log(
       "User must be logged in before enabling notifications."
     );
+
     return;
+
   }
+
 
   try {
 
     const permission =
       await Notification.requestPermission();
 
+
     if (permission !== "granted") {
+
       console.log(
         "Notification permission was not granted."
       );
+
       return;
+
     }
+
 
     const registration =
       await navigator.serviceWorker.ready;
 
+
     let subscription =
       await registration.pushManager.getSubscription();
+
 
     if (!subscription) {
 
@@ -4420,11 +4444,14 @@ async function enablePushNotifications() {
 
     }
 
+
     const subscriptionJson =
       subscription.toJSON();
 
+
     const endpoint =
       subscriptionJson.endpoint;
+
 
     const {
       data: employee,
@@ -4436,9 +4463,13 @@ async function enablePushNotifications() {
         .eq("user_id", currentUser.id)
         .maybeSingle();
 
+
     if (employeeError) {
+
       throw employeeError;
+
     }
+
 
     const {
       error: saveError
@@ -4468,9 +4499,13 @@ async function enablePushNotifications() {
           }
         );
 
+
     if (saveError) {
+
       throw saveError;
+
     }
+
 
     console.log(
       "Push notifications enabled! 🫧"
@@ -4484,6 +4519,97 @@ async function enablePushNotifications() {
     );
 
   }
+
+}
+
+
+/* ==============================
+   SERVICE WORKER
+============================== */
+
+if ("serviceWorker" in navigator) {
+
+  navigator.serviceWorker.register("/sw.js")
+
+    .then(function(registration) {
+
+      console.log(
+        "Bubble Schedule notification service worker registered.",
+        registration
+      );
+
+    })
+
+    .catch(function(error) {
+
+      console.error(
+        "Notification service worker registration failed:",
+        error
+      );
+
+    });
+
+}
+
+
+/* ==============================
+   NOTIFICATION BUTTON
+============================== */
+
+const notificationMessage =
+  document.getElementById(
+    "notificationMessage"
+  );
+
+const notificationButton =
+  document.getElementById(
+    "enableNotificationsButton"
+  );
+
+
+if (notificationButton) {
+
+  notificationButton.addEventListener(
+    "click",
+    async function() {
+
+      if (notificationMessage) {
+
+        notificationMessage.textContent =
+          "Starting notification setup... 🫧";
+
+      }
+
+
+      try {
+
+        await enablePushNotifications();
+
+
+        if (notificationMessage) {
+
+          notificationMessage.textContent =
+            "Notification setup finished. 🫧";
+
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        if (notificationMessage) {
+
+          notificationMessage.textContent =
+            "Error: " +
+            error.message;
+
+        }
+
+      }
+
+    }
+  );
 
 }
 </script>
