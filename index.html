@@ -4496,59 +4496,49 @@ async function enablePushNotifications() {
 </script>
 
 <script>
-if ("serviceWorker" in navigator) {
+    console.log(
+      "Push notifications enabled! 🫧"
+    );
 
-  window.addEventListener(
-    "load",
-      function() {
+  } catch (error) {
 
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then(function(registration) {
-
-          console.log(
-            "Bubble Schedule notification service worker registered.",
-            registration
-          );
-
-        })
-        .catch(function(error) {
-
-          console.error(
-            "Notification service worker registration failed:",
-            error
-          );
-
-        });
-
-    }
-  );
-
-}
-
-
-/* ==============================
-   ENABLE NOTIFICATIONS BUTTON
-============================== */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-  const notificationButton =
-    document.getElementById("enableNotificationsButton");
-
-  if (notificationButton) {
-
-    notificationButton.onclick = function () {
-      enablePushNotifications();
-    };
+    console.error(
+      "Push notification setup error:",
+      error
+    );
 
   }
 
-});
-
+}
 </script>
-</body>
-</html>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js")
+    .then(function(registration) {
+      console.log(
+        "Bubble Schedule notification service worker registered.",
+        registration
+      );
+    })
+    .catch(function(error) {
+      console.error(
+        "Notification service worker registration failed:",
+        error
+      );
+    });
+}
+
+const notificationButton =
+  document.getElementById("enableNotificationsButton");
+
+if (notificationButton) {
+  notificationButton.addEventListener(
+    "click",
+    enablePushNotifications
+  );
+}
+</script>
 
 </body>
 </html>
