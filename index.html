@@ -4500,7 +4500,7 @@ if ("serviceWorker" in navigator) {
 
   window.addEventListener(
     "load",
-    function() {
+      function() {
 
       navigator.serviceWorker
         .register("/sw.js")
@@ -4512,7 +4512,7 @@ if ("serviceWorker" in navigator) {
           );
 
         })
-               .catch(function(error) {
+        .catch(function(error) {
 
           console.error(
             "Notification service worker registration failed:",
@@ -4520,10 +4520,11 @@ if ("serviceWorker" in navigator) {
           );
 
         });
-    });
 
-  }
-);
+    }
+  );
+
+}
 
 
 /* ==============================
@@ -4531,18 +4532,21 @@ if ("serviceWorker" in navigator) {
 ============================== */
 
 document.addEventListener("DOMContentLoaded", function () {
+
   const notificationButton =
     document.getElementById("enableNotificationsButton");
 
   if (notificationButton) {
+
     notificationButton.onclick = function () {
       enablePushNotifications();
     };
+
   }
+
 });
 
 </script>
-
 </body>
 </html>
 
