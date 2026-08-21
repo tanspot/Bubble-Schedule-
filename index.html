@@ -4512,14 +4512,14 @@ if ("serviceWorker" in navigator) {
           );
 
         })
-       .catch(function(error) {
+               .catch(function(error) {
 
-         .catch(function(error) {
+          console.error(
+            "Notification service worker registration failed:",
+            error
+          );
 
-      console.error(
-        "Notification service worker registration failed:",
-        error
-      );
+        });
     });
 
   }
