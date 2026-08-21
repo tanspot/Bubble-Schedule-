@@ -4496,23 +4496,6 @@ async function enablePushNotifications() {
 </script>
 
 <script>
-    console.log(
-      "Push notifications enabled! 🫧"
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Push notification setup error:",
-      error
-    );
-
-  }
-
-}
-</script>
-
-<script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js")
     .then(function(registration) {
