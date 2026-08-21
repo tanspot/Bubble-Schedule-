@@ -4357,27 +4357,21 @@ function urlBase64ToUint8Array(base64String) {
 
 async function enablePushNotifications() {
 
-  if (
-    !("Notification" in window)
-  ) {
+  if (!("Notification" in window)) {
     console.log(
       "This browser does not support notifications."
     );
     return;
   }
 
-  if (
-    !("serviceWorker" in navigator)
-  ) {
+  if (!("serviceWorker" in navigator)) {
     console.log(
       "This browser does not support service workers."
     );
     return;
   }
 
-  if (
-    !("PushManager" in window)
-  ) {
+  if (!("PushManager" in window)) {
     console.log(
       "This browser does not support push notifications."
     );
@@ -4396,9 +4390,7 @@ async function enablePushNotifications() {
     const permission =
       await Notification.requestPermission();
 
-    if (
-      permission !== "granted"
-    ) {
+    if (permission !== "granted") {
       console.log(
         "Notification permission was not granted."
       );
@@ -4512,16 +4504,44 @@ if ("serviceWorker" in navigator) {
     });
 }
 
-const notificationButton =
+const notificationMessage =
+  document.getElementById("notificationMessage");
+  const notificationButton =
   document.getElementById("enableNotificationsButton");
 
 if (notificationButton) {
-  notificationButton.addEventListener(
-    "click",
-    enablePushNotifications
-  );
+
+  notificationButton.addEventListener("click", async function () {
+
+    if (notificationMessage) {
+      notificationMessage.textContent =
+        "Starting notification setup... 🫧";
+    }
+
+    try {
+
+      await enablePushNotifications();
+
+      if (notificationMessage) {
+        notificationMessage.textContent =
+          "Notification setup finished. 🫧";
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      if (notificationMessage) {
+        notificationMessage.textContent =
+          "Error: " + error.message;
+      }
+
+    }
+
+  });
+
 }
-</script>
+  </script>
 
 </body>
 </html>
