@@ -4520,7 +4520,6 @@ if ("serviceWorker" in navigator) {
         "Notification service worker registration failed:",
         error
       );
-
     });
 
   }
@@ -4532,27 +4531,20 @@ if ("serviceWorker" in navigator) {
 ============================== */
 
 document.addEventListener("DOMContentLoaded", function () {
-
   const notificationButton =
-    document.getElementById(
-      "enableNotificationsButton"
-    );
+    document.getElementById("enableNotificationsButton");
 
   if (notificationButton) {
-
-    notificationButton.addEventListener(
-      "click",
-      function () {
-
-        enablePushNotifications();
-
-      }
-    );
-
+    notificationButton.onclick = function () {
+      enablePushNotifications();
+    };
   }
-
 });
+
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
