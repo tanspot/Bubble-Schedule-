@@ -4531,13 +4531,27 @@ if ("serviceWorker" in navigator) {
    ENABLE NOTIFICATIONS BUTTON
 ============================== */
 
-document
-  .getElementById("enableNotificationsButton")
-  ?.addEventListener(
-    "click",
-    enablePushNotifications
-  );
+document.addEventListener("DOMContentLoaded", function () {
 
+  const notificationButton =
+    document.getElementById(
+      "enableNotificationsButton"
+    );
+
+  if (notificationButton) {
+
+    notificationButton.addEventListener(
+      "click",
+      function () {
+
+        enablePushNotifications();
+
+      }
+    );
+
+  }
+
+});
 </script>
 
 </body>
