@@ -3937,11 +3937,11 @@ function renderCoworkerSchedule(schedule) {
               )}
             </strong>
 
-            <div class="muted">
-              ${item.start_time.substring(0,5)}
-              –
-              ${item.end_time.substring(0,5)}
-            </div>
+           <div class="muted">
+  ${formatTime(item.start_time)}
+  –
+  ${formatTime(item.end_time)}
+</div>
 
           </div>
         `;
