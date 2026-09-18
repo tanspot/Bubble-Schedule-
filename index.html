@@ -3425,27 +3425,16 @@ function formatTime(value) {
     return "—";
   }
 
-  const parts =
-    value.split(":");
+  const parts = value.split(":");
 
-  const date =
-    new Date();
+  let hour = Number(parts[0]);
+  const minute = parts[1] || "00";
 
-  date.setHours(
-    Number(parts[0]),
-    Number(parts[1]),
-    0,
-    0
-  );
+  const suffix = hour >= 12 ? "PM" : "AM";
 
-  return date.toLocaleTimeString(
-  "en-US",
-  {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  }
-);
+  hour = hour % 12 || 12;
+
+  return `${hour}:${minute} ${suffix}`;
 
 }
 
