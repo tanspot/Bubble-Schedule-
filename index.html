@@ -4332,19 +4332,45 @@ document
             }
           );
 
-      if (error) {
+     if (error) {
 
-        message.textContent =
-          error.message;
+  console.error(
+    "Push test error:",
+    error
+  );
 
-        console.error(
-          "Password reset error:",
-          error
-        );
+  console.error(
+    "Push test error details:",
+    {
+      name: error.name,
+      message: error.message,
+      context: error.context
+    }
+  );
 
-        return;
-      }
+  let details = "";
 
+  try {
+    if (error.context) {
+      details = await error.context.text();
+    }
+  } catch (readError) {
+    console.error(
+      "Could not read function error response:",
+      readError
+    );
+  }
+
+  alert(
+    "Push test failed:\n\n" +
+    error.message +
+    (details
+      ? "\n\nDetails:\n" + details
+      : "")
+  );
+
+  return;
+}
       message.style.color =
         "#6d9b7c";
 
