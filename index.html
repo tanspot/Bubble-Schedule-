@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +14,7 @@
 <meta name="theme-color" content="#d9c7ff">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Bubble Schedule">
 
@@ -67,6 +67,11 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: .75;
 }
 
 .hidden {
@@ -478,584 +483,6 @@ h3 {
   margin-top: 9px;
   color: #6f6377;
 }
-/* ==============================
-   WEEKLY SCHEDULE
-============================== */
-
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
-
-async function loadWeeklySchedule() {
-
-  const container =
-    element("weeklyScheduleTable");
-
-  if (!container) return;
-
-  container.innerHTML =
-    `<div class="notice">
-      Loading your team's schedule... 🫧
-    </div>`;
-
-  const {
-    data: employees,
-    error: employeeError
-  } =
-    await supabaseClient
-      .from("team_members")
-      .select("id, full_name, role, email, user_id")
-      .order("full_name");
-
-  if (employeeError) {
-
-    container.innerHTML =
-      `<div class="notice">
-        ${escapeHtml(employeeError.message)}
-      </div>`;
-
-    console.error(
-      "Team loading error:",
-      employeeError
-    );
-
-    return;
-  }
-
-  teamMembers = employees || [];
-
-  if (!teamMembers.length) {
-
-    container.innerHTML =
-      `<div class="empty">
-        No team members found yet 🫧
-      </div>`;
-
-    return;
-  }
-
-  const {
-    data: schedule,
-    error: scheduleError
-  } =
-    await supabaseClient
-      .from("weekly_schedule")
-      .select("*")
-      .order("employee_id")
-      .order("day_of_week");
-
-  if (scheduleError) {
-
-    container.innerHTML =
-      `<div class="notice">
-        ${escapeHtml(scheduleError.message)}
-      </div>`;
-
-    console.error(
-      "Weekly schedule loading error:",
-      scheduleError
-    );
-
-    return;
-  }
-
-  renderWeeklySchedule(schedule || []);
-  renderCoworkerSchedule(schedule || []);
-}
-  const container =
-    element("weeklyScheduleTable");
-
-  if (!teamMembers.length) {
-
-    container.innerHTML =
-      `<div class="empty">
-        Add team members first 🫧
-      </div>`;
-
-    return;
-  }
-
-  let html = `
-    <table
-      style="
-        width:100%;
-        min-width:900px;
-        border-collapse:separate;
-        border-spacing:6px;
-      "
-    >
-
-      <thead>
-        <tr>
-
-          <th style="padding:10px;">
-            Employee
-          </th>
-
-  `;
-
-  dayNames.forEach(day => {
-
-    html += `
-      <th
-        style="
-          padding:10px;
-          color:#66586f;
-          font-size:13px;
-        "
-      >
-        ${day}
-      </th>
-    `;
-
-  });
-
-  html += `
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-
-  teamMembers.forEach(employee => {
-
-    html += `
-      <tr>
-
-        <td
-          style="
-            padding:10px;
-            background:#f1e6fa;
-            border-radius:14px;
-            font-weight:800;
-            white-space:nowrap;
-          "
-        >
-          ${escapeHtml(employee.full_name)}
-        </td>
-    `;
-
-
-    for (let day = 0; day < 7; day++) {
-
-      const existing =
-        schedule.find(item =>
-          item.employee_id === employee.id &&
-          Number(item.day_of_week) === day
-        );
-
-      const start =
-        existing?.start_time
-          ? existing.start_time.substring(0,5)
-          : "";
-
-      const end =
-        existing?.end_time
-          ? existing.end_time.substring(0,5)
-          : "";
-
-      const dayOff =
-        existing?.is_day_off || false;
-
-
-      html += `
-        <td
-          style="
-            background:#faf7fd;
-            border:1px solid #eadfec;
-            border-radius:15px;
-            padding:8px;
-            min-width:125px;
-          "
-        >
-
-          <input
-            type="time"
-            class="weekly-start"
-            data-employee="${employee.id}"
-            data-day="${day}"
-            value="${start}"
-            style="
-              width:100%;
-              padding:8px;
-              border:1px solid #eadfec;
-              border-radius:10px;
-              margin-bottom:5px;
-            "
-          >
-
-          <input
-            type="time"
-            class="weekly-end"
-            data-employee="${employee.id}"
-            data-day="${day}"
-            value="${end}"
-            style="
-              width:100%;
-              padding:8px;
-              border:1px solid #eadfec;
-              border-radius:10px;
-            "
-          >
-
-          <label
-            style="
-              display:flex;
-              align-items:center;
-              gap:5px;
-              font-size:12px;
-              margin-top:7px;
-            "
-          >
-
-            <input
-              type="checkbox"
-              class="weekly-off"
-              data-employee="${employee.id}"
-              data-day="${day}"
-              ${dayOff ? "checked" : ""}
-            >
-
-            OFF
-
-          </label>
-
-        </td>
-      `;
-    }
-
-
-    html += `
-      </tr>
-    `;
-
-  });
-
-
-  html += `
-      </tbody>
-    </table>
-  `;
-
-
-  container.innerHTML = html;
-}
-
-
-async function saveWeeklyScheduleData() {
-
-  const message =
-    element("weeklyScheduleMessage");
-
-  message.textContent = "";
-
-
-  const records = [];
-
-
-  teamMembers.forEach(employee => {
-
-    for (let day = 0; day < 7; day++) {
-
-      const startInput =
-        document.querySelector(
-          `.weekly-start[data-employee="${employee.id}"][data-day="${day}"]`
-        );
-
-      const endInput =
-        document.querySelector(
-          `.weekly-end[data-employee="${employee.id}"][data-day="${day}"]`
-        );
-
-      const offInput =
-        document.querySelector(
-          `.weekly-off[data-employee="${employee.id}"][data-day="${day}"]`
-        );
-
-
-      records.push({
-        employee_id: employee.id,
-        day_of_week: day,
-        start_time:
-          offInput.checked
-            ? null
-            : startInput.value || null,
-        end_time:
-          offInput.checked
-            ? null
-            : endInput.value || null,
-        is_day_off:
-          offInput.checked
-      });
-
-    }
-
-  });
-
-
-  const {
-    error: deleteError
-  } =
-    await supabaseClient
-      .from("weekly_schedule")
-      .delete()
-      .neq(
-        "employee_id",
-        "00000000-0000-0000-0000-000000000000"
-      );
-
-
-  if (deleteError) {
-
-    message.textContent =
-      deleteError.message;
-
-    return;
-  }
-
-
-  const {
-    error: insertError
-  } =
-    await supabaseClient
-      .from("weekly_schedule")
-      .insert(records);
-
-
-  if (insertError) {
-
-    message.textContent =
-      insertError.message;
-
-    return;
-  }
-
-
-  message.style.color = "#6d9b7c";
-
-  message.textContent =
-    "Weekly schedule saved! 🫧";
-
-
-  await loadWeeklySchedule();
-
-}
-
-
-function renderCoworkerSchedule(schedule) {
-
-  const container =
-    element("coworkerSchedule");
-
-  if (!container || !currentUser) {
-    return;
-  }
-
-
-  const myEmployee =
-    teamMembers.find(
-      employee =>
-        employee.user_id === currentUser.id
-    );
-
-
-  if (!myEmployee) {
-
-    container.innerHTML =
-      `<div class="empty">
-        Your employee account is not linked yet.
-      </div>`;
-
-    return;
-  }
-
-
-  const myShifts =
-    schedule.filter(
-      item =>
-        item.employee_id === myEmployee.id &&
-        !item.is_day_off &&
-        item.start_time &&
-        item.end_time
-    );
-
-
-  if (!myShifts.length) {
-
-    container.innerHTML =
-      `<div class="empty">
-        No regular shifts have been set yet.
-      </div>`;
-
-    return;
-  }
-
-
-  let html = "";
-
-
-  myShifts
-    .sort(
-      (a,b) =>
-        Number(a.day_of_week) -
-        Number(b.day_of_week)
-    )
-    .forEach(myShift => {
-
-      const coworkers =
-        schedule.filter(
-          other =>
-            other.employee_id !== myEmployee.id &&
-            Number(other.day_of_week) ===
-              Number(myShift.day_of_week) &&
-            !other.is_day_off &&
-            other.start_time &&
-            other.end_time &&
-            timesOverlap(
-              myShift.start_time,
-              myShift.end_time,
-              other.start_time,
-              other.end_time
-            )
-        );
-
-
-      html += `
-
-        <div
-          style="
-            padding:14px;
-            margin-bottom:10px;
-            background:#f7effd;
-            border-radius:16px;
-          "
-        >
-
-          <strong>
-            ${dayNames[myShift.day_of_week]}
-          </strong>
-
-          <div class="muted">
-            Your shift:
-            ${formatTime(myShift.start_time)}
-            –
-            ${formatTime(myShift.end_time)}
-          </div>
-
-          ${
-            coworkers.length
-              ? `
-                <div
-                  style="
-                    margin-top:10px;
-                    color:#705d80;
-                    font-weight:700;
-                  "
-                >
-                  👯‍♀️ Working with:
-                </div>
-
-                ${coworkers.map(person => {
-
-                  const coworker =
-                    teamMembers.find(
-                      member =>
-                        member.id ===
-                        person.employee_id
-                    );
-
-                  return `
-                    <div
-                      style="
-                        margin-top:6px;
-                        padding:9px;
-                        background:white;
-                        border-radius:12px;
-                      "
-                    >
-                      ${escapeHtml(
-                        coworker?.full_name ||
-                        "Coworker"
-                      )}
-
-                      <span
-                        class="muted"
-                      >
-                        ·
-                        ${formatTime(person.start_time)}
-                        –
-                        ${formatTime(person.end_time)}
-                      </span>
-                    </div>
-                  `;
-
-                }).join("")}
-              `
-              : `
-                <div
-                  class="muted"
-                  style="margin-top:8px;"
-                >
-                  You're working alone this day.
-                </div>
-              `
-          }
-
-        </div>
-
-      `;
-
-    });
-
-
-  container.innerHTML = html;
-}
-
-
-function timesOverlap(
-  startA,
-  endA,
-  startB,
-  endB
-) {
-
-  return (
-    startA < endB &&
-    endA > startB
-  );
-
-}
-
-
-/* OPEN WEEKLY SCHEDULE */
-
-element("openWeeklySchedule")
-  ?.addEventListener(
-    "click",
-    async function() {
-
-      showView("weeklySchedule");
-
-      await loadWeeklySchedule();
-
-    }
-  );
-
-
-/* SAVE WEEKLY SCHEDULE */
-
-element("saveWeeklySchedule")
-  ?.addEventListener(
-    "click",
-    saveWeeklyScheduleData
-  );
-
 
 /* CHECKLIST */
 
@@ -1225,34 +652,37 @@ element("saveWeeklySchedule")
 
         <label>Password</label>
 
-<input
-  id="password"
-  type="password"
-  placeholder="Your password"
-  autocomplete="current-password"
-  required
->
-<button
-  id="forgotPassword"
-  type="button"
-  style="
-    background:none;
-    border:none;
-    color:#8b6bb1;
-    text-decoration:underline;
-    cursor:pointer;
-    margin:8px 0 14px;
-    font-size:14px;
-  "
->
-  Forgot password?
-</button>
+        <input
+          id="password"
+          type="password"
+          placeholder="Your password"
+          autocomplete="current-password"
+          required
+        >
 
-<div
-  id="forgotPasswordMessage"
-  class="muted"
-  style="margin-bottom:12px;"
-></div>      </div>
+        <button
+          id="forgotPassword"
+          type="button"
+          style="
+            background:none;
+            border:none;
+            color:#8b6bb1;
+            text-decoration:underline;
+            cursor:pointer;
+            margin:8px 0 14px;
+            font-size:14px;
+          "
+        >
+          Forgot password?
+        </button>
+
+        <div
+          id="forgotPasswordMessage"
+          class="muted"
+          style="margin-bottom:12px;"
+        ></div>
+
+      </div>
 
       <button
         class="primary-button"
@@ -1323,20 +753,35 @@ element("saveWeeklySchedule")
           id="roleDisplay"
           class="role-pill"
         ></div>
-<button
-  id="enableNotificationsButton"
-  class="secondary-button"
-  type="button"
-  style="margin-top:15px;width:100%;"
->
-  🔔 Enable Push Notifications
-</button>
 
-<div
-  id="notificationMessage"
-  class="muted"
-  style="margin-top:8px;text-align:center;"
-></div>
+        <!-- PUSH NOTIFICATIONS -->
+
+        <button
+          id="enableNotificationsButton"
+          class="secondary-button"
+          type="button"
+          style="margin-top:15px;width:100%;"
+        >
+          🔔 Enable Push Notifications
+        </button>
+
+        <div
+          id="notificationMessage"
+          class="muted"
+          style="margin-top:8px;text-align:center;"
+        ></div>
+
+        <!-- TEMPORARY PUSH TEST BUTTON -->
+
+        <button
+          id="testPushButton"
+          class="secondary-button"
+          type="button"
+          style="margin-top:10px;width:100%;"
+        >
+          🧪 Send Test Notification
+        </button>
+
       </div>
 
       <div class="section-title">
@@ -1418,135 +863,137 @@ element("saveWeeklySchedule")
       </div>
 
     </section>
-<!-- TIME OFF REQUESTS -->
 
-<section
-  id="timeOffView"
-  class="view"
->
+    <!-- TIME OFF REQUESTS -->
 
-  <div class="page-header">
-
-    <button
-      class="back-button"
-      data-view="home"
-      type="button"
+    <section
+      id="timeOffView"
+      class="view"
     >
-      ←
-    </button>
 
-    <div>
-      <h2>Time Off 🫧</h2>
+      <div class="page-header">
 
-      <div class="muted">
-        Request time away from work
-      </div>
-    </div>
+        <button
+          class="back-button"
+          data-view="home"
+          type="button"
+        >
+          ←
+        </button>
 
-  </div>
+        <div>
+          <h2>Time Off 🫧</h2>
 
-  <div class="card">
+          <div class="muted">
+            Request time away from work
+          </div>
+        </div>
 
-    <h3>Request Time Off</h3>
-
-    <div class="input-group">
-
-      <label>Employee</label>
-
-      <select id="timeOffEmployee">
-
-        <option value="">
-          Select employee
-        </option>
-
-      </select>
-
-    </div>
-
-    <div class="input-group">
-
-      <label>Start Date</label>
-
-      <input
-        id="timeOffStart"
-        type="date"
-      >
-
-    </div>
-
-    <div class="input-group">
-
-      <label>End Date</label>
-
-      <input
-        id="timeOffEnd"
-        type="date"
-      >
-
-    </div>
-
-    <div class="input-group">
-
-      <label>Reason</label>
-
-      <textarea
-        id="timeOffReason"
-        placeholder="Optional"
-      ></textarea>
-
-    </div>
-
-    <div class="input-group">
-
-      <label>Need a shift switch?</label>
-
-      <select id="timeOffSwitchEmployee">
-
-        <option value="">
-          No — I don't need a switch
-        </option>
-
-      </select>
-
-      <div
-        class="muted"
-        style="margin-top:6px;"
-      >
-        Choose a coworker if you'd like to ask them to cover your shift.
       </div>
 
-    </div>
+      <div class="card">
 
-    <button
-      id="submitTimeOff"
-      class="primary-button"
-      type="button"
-    >
-      Submit Request 🫧
-    </button>
+        <h3>Request Time Off</h3>
 
-    <div
-      id="timeOffMessage"
-      class="error"
-    ></div>
+        <div class="input-group">
 
-  </div>
+          <label>Employee</label>
 
-  <div class="card">
+          <select id="timeOffEmployee">
 
-    <h3>My Requests</h3>
+            <option value="">
+              Select employee
+            </option>
 
-    <div id="myTimeOffRequests">
+          </select>
 
-      <div class="empty">
-        No time-off requests yet 🫧
+        </div>
+
+        <div class="input-group">
+
+          <label>Start Date</label>
+
+          <input
+            id="timeOffStart"
+            type="date"
+          >
+
+        </div>
+
+        <div class="input-group">
+
+          <label>End Date</label>
+
+          <input
+            id="timeOffEnd"
+            type="date"
+          >
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Reason</label>
+
+          <textarea
+            id="timeOffReason"
+            placeholder="Optional"
+          ></textarea>
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Need a shift switch?</label>
+
+          <select id="timeOffSwitchEmployee">
+
+            <option value="">
+              No — I don't need a switch
+            </option>
+
+          </select>
+
+          <div
+            class="muted"
+            style="margin-top:6px;"
+          >
+            Choose a coworker if you'd like to ask them to cover your shift.
+          </div>
+
+        </div>
+
+        <button
+          id="submitTimeOff"
+          class="primary-button"
+          type="button"
+        >
+          Submit Request 🫧
+        </button>
+
+        <div
+          id="timeOffMessage"
+          class="error"
+        ></div>
+
       </div>
 
-    </div>
+      <div class="card">
 
-  </div>
+        <h3>My Requests</h3>
 
-</section>
+        <div id="myTimeOffRequests">
+
+          <div class="empty">
+            No time-off requests yet 🫧
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
     <!-- SCHEDULE -->
 
     <section
@@ -1646,23 +1093,25 @@ element("saveWeeklySchedule")
         ></div>
 
       </div>
-<button
-  id="openWeeklySchedule"
-  type="button"
-  class="primary-button"
-  style="margin-bottom:18px;"
-  onclick="showView('weeklySchedule')"
->
-  📅 Set Weekly Schedule
-</button>
-   <button
-  type="button"
-  class="primary-button"
-  style="margin-bottom:18px;"
-  onclick="document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('timeOffView').classList.add('active');"
->
-  🏖️ Request Time Off
-</button>
+
+      <button
+        id="openWeeklySchedule"
+        type="button"
+        class="primary-button"
+        style="margin-bottom:18px;"
+      >
+        📅 Set Weekly Schedule
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        style="margin-bottom:18px;"
+        onclick="showView('timeOff')"
+      >
+        🏖️ Request Time Off
+      </button>
+
       <div class="section-title">
         Upcoming Shifts
       </div>
@@ -1781,167 +1230,76 @@ element("saveWeeklySchedule")
       ></div>
 
     </section>
-<!-- WEEKLY SCHEDULE -->
 
-<section
-  id="weeklyScheduleView"
-  class="view"
->
+    <!-- WEEKLY SCHEDULE -->
 
-  <div class="page-header">
-
-    <button
-      class="back-button"
-      data-view="schedule"
+    <section
+      id="weeklyScheduleView"
+      class="view"
     >
-      ←
-    </button>
 
-    <div>
-      <h2>Set Weekly Schedule</h2>
-      <div class="muted">
-        Your team's regular weekly hours
-      </div>
-    </div>
+      <div class="page-header">
 
-  </div>
+        <button
+          class="back-button"
+          data-view="schedule"
+        >
+          ←
+        </button>
 
-  <div class="card">
+        <div>
+          <h2>Set Weekly Schedule</h2>
 
-    <div class="notice">
-      Set each employee's normal hours for every day of the week.
-      Employees will also be able to see who they're working with.
-    </div>
+          <div class="muted">
+            Your team's regular weekly hours
+          </div>
+        </div>
 
-    <div
-      id="weeklyScheduleTable"
-      style="overflow-x:auto;"
-    ></div>
-
-    <button
-      id="saveWeeklySchedule"
-      class="primary-button"
-      style="margin-top:20px;"
-    >
-      Save Weekly Schedule 🫧
-    </button>
-
-    <div
-      id="weeklyScheduleMessage"
-      class="error"
-    ></div>
-
-  </div>
-
-  <div class="card">
-
-    <h3>Who's Working With Me? 👯‍♀️</h3>
-
-    <div
-      id="coworkerSchedule"
-    >
-      <div class="empty">
-        Your coworkers will appear here.
-      </div>
-    </div>
-
-  </div>
-
-</section>
-    <!-- TIME OFF REQUESTS -->
-
-<section
-  id="timeOffView"
-  class="view"
->
-
-  <div class="page-header">
-
-    <button
-      class="back-button"
-      data-view="home"
-      type="button"
-    >
-      ←
-    </button>
-
-    <div>
-      <h2>Time Off 🫧</h2>
-
-      <div class="muted">
-        Request time away from work
-      </div>
-    </div>
-
-  </div>
-
-  <div class="card">
-
-    <h3>Request Time Off</h3>
-
-    <div class="input-group">
-
-      <label>Start Date</label>
-
-      <input
-        id="timeOffStart"
-        type="date"
-      >
-
-    </div>
-
-    <div class="input-group">
-
-      <label>End Date</label>
-
-      <input
-        id="timeOffEnd"
-        type="date"
-      >
-
-    </div>
-
-    <div class="input-group">
-
-      <label>Reason</label>
-
-      <textarea
-        id="timeOffReason"
-        placeholder="Optional"
-      ></textarea>
-
-    </div>
-
-    <button
-      id="submitTimeOff"
-      class="primary-button"
-      type="button"
-    >
-      Submit Request 🫧
-    </button>
-
-    <div
-      id="timeOffMessage"
-      class="error"
-    ></div>
-
-  </div>
-
-  <div class="card">
-
-    <h3>My Requests</h3>
-
-    <div id="myTimeOffRequests">
-
-      <div class="empty">
-        No time-off requests yet 🫧
       </div>
 
-    </div>
+      <div class="card">
 
-  </div>
+        <div class="notice">
+          Set each employee's normal hours for every day of the week.
+          Employees will also be able to see who they're working with.
+        </div>
 
-</section>
+        <div
+          id="weeklyScheduleTable"
+          style="overflow-x:auto;"
+        ></div>
+
+        <button
+          id="saveWeeklySchedule"
+          class="primary-button"
+          style="margin-top:20px;"
+        >
+          Save Weekly Schedule 🫧
+        </button>
+
+        <div
+          id="weeklyScheduleMessage"
+          class="error"
+        ></div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>Who's Working With Me? 👯‍♀️</h3>
+
+        <div id="coworkerSchedule">
+
+          <div class="empty">
+            Your coworkers will appear here.
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
     <!-- NOTES -->
 
     <section
@@ -2176,8 +1534,15 @@ element("saveWeeklySchedule")
 </div>
 
 <script>
+
+/* ==============================
+   VAPID PUBLIC KEY
+============================== */
+
 window.BUBBLE_VAPID_PUBLIC_KEY =
   "BLN4h8jqvIZRLm9pXT7TKOYS_UixIGKb9KrOVuc9C-iBfGkZ6a3DZ60UD1SwgW1z4STdjeEpfMHuv5P4yF7Ii0c";
+
+
 /* ==============================
    SUPABASE
 ============================== */
@@ -2194,6 +1559,7 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
+
 /* ==============================
    STATE
 ============================== */
@@ -2202,13 +1568,17 @@ let currentUser = null;
 let currentProfile = null;
 let teamMembers = [];
 
+
 /* ==============================
    HELPERS
 ============================== */
 
 function element(id) {
+
   return document.getElementById(id);
+
 }
+
 
 function escapeHtml(value) {
 
@@ -2225,6 +1595,7 @@ function escapeHtml(value) {
 
 }
 
+
 function isManager() {
 
   return (
@@ -2236,6 +1607,7 @@ function isManager() {
   );
 
 }
+
 
 /* ==============================
    NAVIGATION
@@ -2274,26 +1646,28 @@ function showView(viewName) {
   }
 
   if (viewName === "weeklySchedule") {
+
     loadTeam().then(() => {
       loadWeeklySchedule();
     });
+
   }
 
-if (viewName === "timeOff") {
+  if (viewName === "timeOff") {
 
-  loadTeam().then(function() {
+    loadTeam().then(function() {
 
-    populateTimeOffEmployees();
+      populateTimeOffEmployees();
 
-    if (
-      typeof loadTimeOffRequests === "function"
-    ) {
-      loadTimeOffRequests();
-    }
+      if (
+        typeof loadTimeOffRequests === "function"
+      ) {
+        loadTimeOffRequests();
+      }
 
-  });
+    });
 
-}
+  }
 
   if (viewName === "checklists") {
     loadChecklists();
@@ -2309,11 +1683,16 @@ document
     button.addEventListener(
       "click",
       function() {
-        showView(this.dataset.view);
+
+        showView(
+          this.dataset.view
+        );
+
       }
     );
 
   });
+
 
 /* ==============================
    LOGIN
@@ -2329,7 +1708,9 @@ element("loginForm")
       element("loginError").textContent = "";
 
       const email =
-        element("email").value.trim();
+        element("email")
+          .value
+          .trim();
 
       const password =
         element("password").value;
@@ -2353,10 +1734,11 @@ element("loginForm")
         return;
       }
 
-   await showApp(data.user);
+      await showApp(data.user);
 
     }
   );
+
 
 /* ==============================
    SHOW APP
@@ -2381,7 +1763,10 @@ async function showApp(user) {
 
   if (error || !profile) {
 
-    console.error("PROFILE ERROR:", error);
+    console.error(
+      "PROFILE ERROR:",
+      error
+    );
 
     element("welcome").textContent =
       "Welcome!";
@@ -2393,7 +1778,9 @@ async function showApp(user) {
 
   element("welcome").textContent =
     profile.full_name
-      ? "Welcome, " + profile.full_name + "!"
+      ? "Welcome, " +
+        profile.full_name +
+        "!"
       : "Welcome!";
 
   element("roleDisplay").textContent =
@@ -2438,27 +1825,36 @@ async function showApp(user) {
 
 }
 
+
 /* ==============================
    LOGOUT
 ============================== */
 
 async function logout() {
 
-  await supabaseClient.auth.signOut();
+  await supabaseClient
+    .auth
+    .signOut();
 
   currentUser = null;
   currentProfile = null;
   teamMembers = [];
 
-  element("app").classList.add("hidden");
+  element("app")
+    .classList
+    .add("hidden");
 
-  element("loginScreen").style.display = "flex";
+  element("loginScreen")
+    .style
+    .display = "flex";
 
-  element("loginForm").reset();
+  element("loginForm")
+    .reset();
 
   showView("home");
 
 }
+
 
 element("logoutButton")
   .addEventListener(
@@ -2466,11 +1862,13 @@ element("logoutButton")
     logout
   );
 
+
 element("settingsLogout")
   .addEventListener(
     "click",
     logout
   );
+
 
 /* ==============================
    LOAD TEAM
@@ -2501,7 +1899,10 @@ async function loadTeam() {
 
     list.innerHTML =
       `<div class="card">
-        <strong>Unable to load team members.</strong>
+        <strong>
+          Unable to load team members.
+        </strong>
+
         <p class="muted">
           ${escapeHtml(error.message)}
         </p>
@@ -2510,7 +1911,9 @@ async function loadTeam() {
     return;
   }
 
-  teamMembers = data || [];
+  teamMembers =
+    data || [];
+
   populateTimeOffEmployees();
 
   element("teamStat").textContent =
@@ -2545,11 +1948,13 @@ async function loadTeam() {
           <div class="team-member">
 
             <div class="member-avatar">
+
               ${
                 member.role === "manager"
                   ? "👑"
                   : "🫧"
               }
+
             </div>
 
             <div class="member-info">
@@ -2559,6 +1964,7 @@ async function loadTeam() {
               </strong>
 
               <span>
+
                 ${escapeHtml(member.role)}
 
                 ${
@@ -2567,6 +1973,7 @@ async function loadTeam() {
                       escapeHtml(member.email)
                     : ""
                 }
+
               </span>
 
             </div>
@@ -2621,6 +2028,7 @@ async function loadTeam() {
 
 }
 
+
 /* ==============================
    EMPLOYEE SELECTS
 ============================== */
@@ -2630,21 +2038,28 @@ function populateEmployeeSelects() {
   const options =
     teamMembers
       .map(member => `
+
         <option value="${member.id}">
           ${escapeHtml(member.full_name)}
         </option>
+
       `)
       .join("");
 
   element("shiftEmployee").innerHTML =
     options ||
-    `<option value="">No employees</option>`;
+    `<option value="">
+      No employees
+    </option>`;
 
   element("checkEmployee").innerHTML =
     options ||
-    `<option value="">No employees</option>`;
+    `<option value="">
+      No employees
+    </option>`;
 
 }
+
 
 /* ==============================
    ADD TEAM MEMBER
@@ -2724,15 +2139,18 @@ element("saveTeamMember")
 
       } else {
 
-        message.style.color = "#6d9b7c";
+        message.style.color =
+          "#6d9b7c";
 
         message.textContent =
           name +
           " was added successfully! 🫧";
+
       }
 
     }
   );
+
 
 /* ==============================
    INVITE EMPLOYEE
@@ -2748,7 +2166,10 @@ async function inviteEmployee(teamMemberId) {
 
   if (!member) {
 
-    alert("Employee could not be found.");
+    alert(
+      "Employee could not be found."
+    );
+
     return;
   }
 
@@ -2819,6 +2240,7 @@ async function inviteEmployee(teamMemberId) {
 
 }
 
+
 /* ==============================
    REMOVE TEAM MEMBER
 ============================== */
@@ -2855,6 +2277,7 @@ async function removeTeamMember(id) {
 
 }
 
+
 /* ==============================
    LOAD SHIFTS
 ============================== */
@@ -2880,11 +2303,15 @@ async function loadShifts() {
       `)
       .order(
         "shift_date",
-        { ascending: true }
+        {
+          ascending: true
+        }
       )
       .order(
         "start_time",
-        { ascending: true }
+        {
+          ascending: true
+        }
       );
 
   if (!isManager() && currentUser) {
@@ -2892,7 +2319,8 @@ async function loadShifts() {
     const mine =
       teamMembers.find(
         member =>
-          member.user_id === currentUser.id
+          member.user_id ===
+          currentUser.id
       );
 
     if (!mine) {
@@ -2902,7 +2330,8 @@ async function loadShifts() {
           Your employee account is not linked yet.
         </div>`;
 
-      element("todayStat").textContent = "0";
+      element("todayStat")
+        .textContent = "0";
 
       return;
     }
@@ -2912,6 +2341,7 @@ async function loadShifts() {
         "employee_id",
         mine.id
       );
+
   }
 
   const {
@@ -2924,27 +2354,34 @@ async function loadShifts() {
 
     list.innerHTML =
       `<div class="card">
-        <strong>Unable to load schedule.</strong>
+
+        <strong>
+          Unable to load schedule.
+        </strong>
+
         <p class="muted">
           ${escapeHtml(error.message)}
         </p>
+
       </div>`;
 
     return;
   }
 
-  const shifts = data || [];
+  const shifts =
+    data || [];
 
   const today =
     new Date()
       .toISOString()
       .slice(0, 10);
 
-  element("todayStat").textContent =
-    shifts.filter(
-      shift =>
-        shift.shift_date === today
-    ).length;
+  element("todayStat")
+    .textContent =
+      shifts.filter(
+        shift =>
+          shift.shift_date === today
+      ).length;
 
   if (!shifts.length) {
 
@@ -3007,6 +2444,7 @@ async function loadShifts() {
           ${
             isManager()
               ? `
+
                 <div class="member-actions">
 
                   <button
@@ -3017,6 +2455,7 @@ async function loadShifts() {
                   </button>
 
                 </div>
+
               `
               : ""
           }
@@ -3027,6 +2466,7 @@ async function loadShifts() {
       .join("");
 
 }
+
 
 /* ==============================
    ADD SHIFT
@@ -3044,15 +2484,18 @@ element("saveShift")
         element("shiftDate").value;
 
       const start_time =
-        element("shiftStart").value || null;
+        element("shiftStart").value ||
+        null;
 
       const end_time =
-        element("shiftEnd").value || null;
+        element("shiftEnd").value ||
+        null;
 
       const notes =
         element("shiftNotes")
           .value
-          .trim() || null;
+          .trim() ||
+        null;
 
       const message =
         element("shiftMessage");
@@ -3060,21 +2503,25 @@ element("saveShift")
       message.textContent = "";
 
       if (!employee_id || !shift_date) {
+
         message.textContent =
           "Choose an employee and date.";
+
         return;
       }
 
       const {
         data: employee,
         error: employeeError
-      } = await supabaseClient
-        .from("team_members")
-        .select("id, full_name")
-        .eq("id", employee_id)
-        .single();
+      } =
+        await supabaseClient
+          .from("team_members")
+          .select("id, full_name")
+          .eq("id", employee_id)
+          .single();
 
       if (employeeError || !employee) {
+
         message.textContent =
           "That employee could not be found. Please refresh the Team list and try again.";
 
@@ -3088,17 +2535,20 @@ element("saveShift")
 
       const {
         error
-      } = await supabaseClient
-        .from("shifts")
-        .insert({
-          employee_id: employee.id,
-          shift_date,
-          start_time,
-          end_time,
-          notes
-        });
+      } =
+        await supabaseClient
+          .from("shifts")
+          .insert({
+            employee_id:
+              employee.id,
+            shift_date,
+            start_time,
+            end_time,
+            notes
+          });
 
       if (error) {
+
         message.textContent =
           error.message;
 
@@ -3122,6 +2572,7 @@ element("saveShift")
 
     }
   );
+
 
 /* ==============================
    DELETE SHIFT
@@ -3155,6 +2606,7 @@ async function deleteShift(id) {
 
 }
 
+
 /* ==============================
    CHECKLISTS
 ============================== */
@@ -3181,7 +2633,9 @@ async function loadChecklists() {
       `)
       .order(
         "created_at",
-        { ascending: false }
+        {
+          ascending: false
+        }
       );
 
   if (!isManager() && currentUser) {
@@ -3189,7 +2643,8 @@ async function loadChecklists() {
     const mine =
       teamMembers.find(
         member =>
-          member.user_id === currentUser.id
+          member.user_id ===
+          currentUser.id
       );
 
     if (!mine) {
@@ -3207,6 +2662,7 @@ async function loadChecklists() {
         "assigned_employee_id",
         mine.id
       );
+
   }
 
   const {
@@ -3219,10 +2675,15 @@ async function loadChecklists() {
 
     list.innerHTML =
       `<div class="card">
-        <strong>Unable to load checklists.</strong>
+
+        <strong>
+          Unable to load checklists.
+        </strong>
+
         <p class="muted">
           ${escapeHtml(error.message)}
         </p>
+
       </div>`;
 
     return;
@@ -3275,6 +2736,7 @@ async function loadChecklists() {
               <div class="muted">
 
                 Assigned to:
+
                 ${
                   escapeHtml(
                     item.team_members?.full_name ||
@@ -3342,6 +2804,7 @@ async function loadChecklists() {
 
 }
 
+
 /* ==============================
    ADD CHECKLIST
 ============================== */
@@ -3359,7 +2822,8 @@ element("saveChecklist")
       const description =
         element("checkDescription")
           .value
-          .trim() || null;
+          .trim() ||
+        null;
 
       const assigned_employee_id =
         element("checkEmployee").value;
@@ -3369,7 +2833,10 @@ element("saveChecklist")
 
       message.textContent = "";
 
-      if (!title || !assigned_employee_id) {
+      if (
+        !title ||
+        !assigned_employee_id
+      ) {
 
         message.textContent =
           "Enter a title and choose an employee.";
@@ -3386,7 +2853,8 @@ element("saveChecklist")
             title,
             description,
             assigned_employee_id,
-            assigned_by: currentUser.id
+            assigned_by:
+              currentUser.id
           });
 
       if (error) {
@@ -3397,7 +2865,8 @@ element("saveChecklist")
         return;
       }
 
-      message.style.color = "#6d9b7c";
+      message.style.color =
+        "#6d9b7c";
 
       message.textContent =
         "Checklist assigned! 🫧";
@@ -3409,6 +2878,7 @@ element("saveChecklist")
 
     }
   );
+
 
 /* ==============================
    COMPLETE CHECKLIST
@@ -3437,6 +2907,7 @@ async function completeChecklist(id) {
   await loadChecklists();
 
 }
+
 
 /* ==============================
    DELETE CHECKLIST
@@ -3470,6 +2941,7 @@ async function deleteChecklist(id) {
 
 }
 
+
 /* ==============================
    DATE / TIME
 ============================== */
@@ -3492,6 +2964,7 @@ function formatDate(value) {
   );
 
 }
+
 
 function formatTime(value) {
 
@@ -3522,49 +2995,7 @@ function formatTime(value) {
 
 }
 
-/* ==============================
-   SESSION
-============================== */
 
-async function checkSession() {
-
-  const {
-    data
-  } =
-    await supabaseClient
-      .auth
-      .getSession();
-
-  if (data.session) {
-
-    await showApp(
-      data.session.user
-    );
-
-  }
-
-}
-
-supabaseClient
-  .auth
-  .onAuthStateChange(
-    async function(event, session) {
-
-      if (
-        session &&
-        !currentUser
-      ) {
-
-        await showApp(
-          session.user
-        );
-
-      }
-
-    }
-  );
-
-checkSession();
 /* ==============================
    WEEKLY SCHEDULE
 ============================== */
@@ -3579,10 +3010,13 @@ const dayNames = [
   "Saturday"
 ];
 
+
 async function loadWeeklySchedule() {
 
   const container =
-    document.getElementById("weeklyScheduleTable");
+    document.getElementById(
+      "weeklyScheduleTable"
+    );
 
   if (!container) {
     return;
@@ -3600,7 +3034,9 @@ async function loadWeeklySchedule() {
   } =
     await supabaseClient
       .from("team_members")
-      .select("id, full_name, role, email, user_id")
+      .select(
+        "id, full_name, role, email, user_id"
+      )
       .order("full_name");
 
   if (employeeError) {
@@ -3619,7 +3055,8 @@ async function loadWeeklySchedule() {
     return;
   }
 
-  teamMembers = employees || [];
+  teamMembers =
+    employees || [];
 
   if (!teamMembers.length) {
 
@@ -3658,9 +3095,14 @@ async function loadWeeklySchedule() {
     return;
   }
 
-  renderWeeklySchedule(schedule || []);
+  renderWeeklySchedule(
+    schedule || []
+  );
 
-  renderCoworkerSchedule(schedule || []);
+  renderCoworkerSchedule(
+    schedule || []
+  );
+
 }
 
 
@@ -3671,7 +3113,9 @@ async function loadWeeklySchedule() {
 function renderWeeklySchedule(schedule) {
 
   const container =
-    document.getElementById("weeklyScheduleTable");
+    document.getElementById(
+      "weeklyScheduleTable"
+    );
 
   if (!container) {
     return;
@@ -3738,12 +3182,18 @@ function renderWeeklySchedule(schedule) {
         </td>
     `;
 
-    for (let day = 0; day < 7; day++) {
+    for (
+      let day = 0;
+      day < 7;
+      day++
+    ) {
 
       const existing =
         schedule.find(item =>
-          item.employee_id === employee.id &&
-          Number(item.day_of_week) === day
+          item.employee_id ===
+            employee.id &&
+          Number(item.day_of_week) ===
+            day
         );
 
       const start =
@@ -3757,7 +3207,8 @@ function renderWeeklySchedule(schedule) {
           : "";
 
       const dayOff =
-        existing?.is_day_off || false;
+        existing?.is_day_off ||
+        false;
 
       html += `
         <td
@@ -3825,6 +3276,7 @@ function renderWeeklySchedule(schedule) {
 
         </td>
       `;
+
     }
 
     html += `
@@ -3839,7 +3291,9 @@ function renderWeeklySchedule(schedule) {
     </table>
   `;
 
-  container.innerHTML = html;
+  container.innerHTML =
+    html;
+
 }
 
 
@@ -3850,7 +3304,9 @@ function renderWeeklySchedule(schedule) {
 async function saveWeeklyScheduleData() {
 
   const message =
-    document.getElementById("weeklyScheduleMessage");
+    document.getElementById(
+      "weeklyScheduleMessage"
+    );
 
   message.textContent = "";
 
@@ -3866,7 +3322,11 @@ async function saveWeeklyScheduleData() {
 
   teamMembers.forEach(employee => {
 
-    for (let day = 0; day < 7; day++) {
+    for (
+      let day = 0;
+      day < 7;
+      day++
+    ) {
 
       const startInput =
         document.querySelector(
@@ -3883,7 +3343,11 @@ async function saveWeeklyScheduleData() {
           `.weekly-off[data-employee="${employee.id}"][data-day="${day}"]`
         );
 
-      if (!startInput || !endInput || !offInput) {
+      if (
+        !startInput ||
+        !endInput ||
+        !offInput
+      ) {
         continue;
       }
 
@@ -3891,18 +3355,32 @@ async function saveWeeklyScheduleData() {
         offInput.checked;
 
       records.push({
-        employee_id: employee.id,
-        day_of_week: day,
+
+        employee_id:
+          employee.id,
+
+        day_of_week:
+          day,
+
         start_time:
           isDayOff
             ? null
-            : (startInput.value || null),
+            : (
+                startInput.value ||
+                null
+              ),
+
         end_time:
           isDayOff
             ? null
-            : (endInput.value || null),
+            : (
+                endInput.value ||
+                null
+              ),
+
         is_day_off:
           isDayOff
+
       });
 
     }
@@ -3935,10 +3413,14 @@ async function saveWeeklyScheduleData() {
     return;
   }
 
+  message.style.color =
+    "#6d9b7c";
+
   message.textContent =
     "Weekly schedule saved successfully! 🫧";
 
   await loadWeeklySchedule();
+
 }
 
 
@@ -3949,7 +3431,9 @@ async function saveWeeklyScheduleData() {
 function renderCoworkerSchedule(schedule) {
 
   const container =
-    document.getElementById("coworkerSchedule");
+    document.getElementById(
+      "coworkerSchedule"
+    );
 
   if (!container) {
     return;
@@ -3960,7 +3444,8 @@ function renderCoworkerSchedule(schedule) {
 
   const workingToday =
     schedule.filter(item =>
-      Number(item.day_of_week) === today &&
+      Number(item.day_of_week) ===
+        today &&
       !item.is_day_off &&
       item.start_time &&
       item.end_time
@@ -3984,7 +3469,8 @@ function renderCoworkerSchedule(schedule) {
         const employee =
           teamMembers.find(
             member =>
-              member.id === item.employee_id
+              member.id ===
+              item.employee_id
           );
 
         if (!employee) {
@@ -4001,8 +3487,11 @@ function renderCoworkerSchedule(schedule) {
               border-radius:14px;
             "
           >
+
             <strong>
-              ${escapeHtml(employee.full_name)}
+              ${escapeHtml(
+                employee.full_name
+              )}
             </strong>
 
             <div class="muted">
@@ -4016,28 +3505,62 @@ function renderCoworkerSchedule(schedule) {
 
       })
       .join("");
+
 }
 
 
 /* ==============================
-   WEEKLY SCHEDULE BUTTON
+   WEEKLY SCHEDULE BUTTONS
 ============================== */
 
 document
-  .getElementById("saveWeeklySchedule")
+  .getElementById(
+    "openWeeklySchedule"
+  )
+  ?.addEventListener(
+    "click",
+    async function() {
+
+      showView(
+        "weeklySchedule"
+      );
+
+      await loadWeeklySchedule();
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "saveWeeklySchedule"
+  )
   ?.addEventListener(
     "click",
     saveWeeklyScheduleData
   );
- async function populateTimeOffEmployees() {
+
+
+/* ==============================
+   TIME OFF EMPLOYEES
+============================== */
+
+async function populateTimeOffEmployees() {
 
   const employeeSelect =
-    document.getElementById("timeOffEmployee");
+    document.getElementById(
+      "timeOffEmployee"
+    );
 
   const switchSelect =
-    document.getElementById("timeOffSwitchEmployee");
+    document.getElementById(
+      "timeOffSwitchEmployee"
+    );
 
-  if (!employeeSelect || !switchSelect) {
+  if (
+    !employeeSelect ||
+    !switchSelect
+  ) {
     return;
   }
 
@@ -4059,7 +3582,9 @@ document
   } =
     await supabaseClient
       .from("team_members")
-      .select("id, full_name")
+      .select(
+        "id, full_name"
+      )
       .order("full_name");
 
   if (error) {
@@ -4084,7 +3609,10 @@ document
     return;
   }
 
-  if (!employees || employees.length === 0) {
+  if (
+    !employees ||
+    employees.length === 0
+  ) {
 
     employeeSelect.innerHTML = `
       <option value="">
@@ -4116,7 +3644,9 @@ document
   employees.forEach(function(employee) {
 
     const employeeOption =
-      document.createElement("option");
+      document.createElement(
+        "option"
+      );
 
     employeeOption.value =
       employee.id;
@@ -4129,7 +3659,9 @@ document
     );
 
     const switchOption =
-      document.createElement("option");
+      document.createElement(
+        "option"
+      );
 
     switchOption.value =
       employee.id;
@@ -4144,30 +3676,43 @@ document
   });
 
 }
-  /* ==============================
+
+
+/* ==============================
    TIME OFF REQUESTS
 ============================== */
 
 async function submitTimeOffRequest() {
 
   const startDate =
-    document.getElementById("timeOffStart").value;
+    document.getElementById(
+      "timeOffStart"
+    ).value;
 
   const endDate =
-    document.getElementById("timeOffEnd").value;
+    document.getElementById(
+      "timeOffEnd"
+    ).value;
 
   const reason =
     document
-      .getElementById("timeOffReason")
+      .getElementById(
+        "timeOffReason"
+      )
       .value
       .trim();
 
   const message =
-    document.getElementById("timeOffMessage");
+    document.getElementById(
+      "timeOffMessage"
+    );
 
   message.textContent = "";
 
-  if (!startDate || !endDate) {
+  if (
+    !startDate ||
+    !endDate
+  ) {
 
     message.textContent =
       "Please choose a start and end date.";
@@ -4175,7 +3720,9 @@ async function submitTimeOffRequest() {
     return;
   }
 
-  if (endDate < startDate) {
+  if (
+    endDate < startDate
+  ) {
 
     message.textContent =
       "The end date cannot be before the start date.";
@@ -4200,10 +3747,16 @@ async function submitTimeOffRequest() {
       await supabaseClient
         .from("team_members")
         .select("id")
-        .eq("user_id", currentUser.id)
+        .eq(
+          "user_id",
+          currentUser.id
+        )
         .single();
 
-    if (employeeError || !employee) {
+    if (
+      employeeError ||
+      !employee
+    ) {
 
       message.textContent =
         "Your employee account could not be found.";
@@ -4222,27 +3775,45 @@ async function submitTimeOffRequest() {
       await supabaseClient
         .from("time_off_requests")
         .insert({
-          employee_id: employee.id,
-          start_date: startDate,
-          end_date: endDate,
-          reason: reason || null
+          employee_id:
+            employee.id,
+          start_date:
+            startDate,
+          end_date:
+            endDate,
+          reason:
+            reason || null
         });
 
     if (error) {
       throw error;
     }
 
+    message.style.color =
+      "#6d9b7c";
+
     message.textContent =
       "Time-off request submitted! 🫧";
 
-    document.getElementById("timeOffStart").value = "";
-    document.getElementById("timeOffEnd").value = "";
-    document.getElementById("timeOffReason").value = "";
+    document.getElementById(
+      "timeOffStart"
+    ).value = "";
+
+    document.getElementById(
+      "timeOffEnd"
+    ).value = "";
+
+    document.getElementById(
+      "timeOffReason"
+    ).value = "";
 
     if (
-      typeof loadTimeOffRequests === "function"
+      typeof loadTimeOffRequests ===
+      "function"
     ) {
+
       await loadTimeOffRequests();
+
     }
 
   } catch (error) {
@@ -4261,20 +3832,32 @@ async function submitTimeOffRequest() {
 
 
 document
-  .getElementById("submitTimeOff")
+  .getElementById(
+    "submitTimeOff"
+  )
   ?.addEventListener(
     "click",
     submitTimeOffRequest
   );
-  document
-  .getElementById("forgotPassword")
+
+
+/* ==============================
+   FORGOT PASSWORD
+============================== */
+
+document
+  .getElementById(
+    "forgotPassword"
+  )
   ?.addEventListener(
     "click",
     async function() {
 
       const email =
         document
-          .getElementById("email")
+          .getElementById(
+            "email"
+          )
           .value
           .trim();
 
@@ -4296,7 +3879,8 @@ document
       const {
         error
       } =
-        await supabaseClient.auth
+        await supabaseClient
+          .auth
           .resetPasswordForEmail(
             email,
             {
@@ -4318,23 +3902,30 @@ document
         return;
       }
 
+      message.style.color =
+        "#6d9b7c";
+
       message.textContent =
         "Password reset email sent! 🫧 Check your email.";
 
     }
   );
-window.BUBBLE_VAPID_PUBLIC_KEY =
-  "BLN4h8jqvIZRLm9pXT7TKOYS_UixIGKb9KrOVuc9C-iBfGkZ6a3DZ60UD1SwgW1z4STdjeEpfMHuv5P4yF7Ii0c";
+
 
 /* ==============================
    PUSH NOTIFICATIONS
 ============================== */
 
-function urlBase64ToUint8Array(base64String) {
+function urlBase64ToUint8Array(
+  base64String
+) {
 
   const padding =
     "=".repeat(
-      (4 - base64String.length % 4) % 4
+      (
+        4 -
+        base64String.length % 4
+      ) % 4
     );
 
   const base64 =
@@ -4342,15 +3933,22 @@ function urlBase64ToUint8Array(base64String) {
       base64String +
       padding
     )
-      .replace(/-/g, "+")
-      .replace(/_/g, "/");
+      .replace(
+        /-/g,
+        "+"
+      )
+      .replace(
+        /_/g,
+        "/"
+      );
 
   const rawData =
     window.atob(base64);
 
   return Uint8Array.from(
     [...rawData].map(
-      char => char.charCodeAt(0)
+      char =>
+        char.charCodeAt(0)
     )
   );
 
@@ -4359,99 +3957,101 @@ function urlBase64ToUint8Array(base64String) {
 
 async function enablePushNotifications() {
 
-  if (!("Notification" in window)) {
+  if (
+    !("Notification" in window)
+  ) {
 
-    console.log(
+    throw new Error(
       "This browser does not support notifications."
     );
 
-    return;
-
   }
 
+  if (
+    !("serviceWorker" in navigator)
+  ) {
 
-  if (!("serviceWorker" in navigator)) {
-
-    console.log(
+    throw new Error(
       "This browser does not support service workers."
     );
 
-    return;
-
   }
 
+  if (
+    !("PushManager" in window)
+  ) {
 
-  if (!("PushManager" in window)) {
-
-    console.log(
+    throw new Error(
       "This browser does not support push notifications."
     );
 
-    return;
-
   }
-
 
   if (!currentUser) {
 
-    console.log(
-      "User must be logged in before enabling notifications."
+    throw new Error(
+      "Please log in before enabling notifications."
     );
-
-    return;
 
   }
 
+  if (
+    !window.BUBBLE_VAPID_PUBLIC_KEY
+  ) {
+
+    throw new Error(
+      "The VAPID public key is missing."
+    );
+
+  }
 
   try {
 
     const permission =
       await Notification.requestPermission();
 
+    if (
+      permission !== "granted"
+    ) {
 
-    if (permission !== "granted") {
-
-      console.log(
+      throw new Error(
         "Notification permission was not granted."
       );
 
-      return;
-
     }
-
 
     const registration =
       await navigator.serviceWorker.ready;
 
-
     let subscription =
-      await registration.pushManager.getSubscription();
-
+      await registration
+        .pushManager
+        .getSubscription();
 
     if (!subscription) {
 
       subscription =
-        await registration.pushManager.subscribe({
+        await registration
+          .pushManager
+          .subscribe({
 
-          userVisibleOnly: true,
+            userVisibleOnly:
+              true,
 
-          applicationServerKey:
-            urlBase64ToUint8Array(
-              window.BUBBLE_VAPID_PUBLIC_KEY
-            )
+            applicationServerKey:
+              urlBase64ToUint8Array(
+                window.BUBBLE_VAPID_PUBLIC_KEY
+              )
 
-        });
+          });
 
     }
-
 
     const subscriptionJson =
       subscription.toJSON();
 
-
     const endpoint =
       subscriptionJson.endpoint;
-
 
     const {
       data: employee,
@@ -4460,16 +4060,15 @@ async function enablePushNotifications() {
       await supabaseClient
         .from("team_members")
         .select("id")
-        .eq("user_id", currentUser.id)
+        .eq(
+          "user_id",
+          currentUser.id
+        )
         .maybeSingle();
 
-
     if (employeeError) {
-
       throw employeeError;
-
     }
-
 
     const {
       error: saveError
@@ -4482,7 +4081,8 @@ async function enablePushNotifications() {
               currentUser.id,
 
             team_member_id:
-              employee?.id || null,
+              employee?.id ||
+              null,
 
             endpoint:
               endpoint,
@@ -4491,7 +4091,8 @@ async function enablePushNotifications() {
               subscriptionJson,
 
             updated_at:
-              new Date().toISOString()
+              new Date()
+                .toISOString()
           },
           {
             onConflict:
@@ -4499,17 +4100,15 @@ async function enablePushNotifications() {
           }
         );
 
-
     if (saveError) {
-
       throw saveError;
-
     }
-
 
     console.log(
       "Push notifications enabled! 🫧"
     );
+
+    return true;
 
   } catch (error) {
 
@@ -4517,6 +4116,8 @@ async function enablePushNotifications() {
       "Push notification setup error:",
       error
     );
+
+    throw error;
 
   }
 
@@ -4527,10 +4128,12 @@ async function enablePushNotifications() {
    SERVICE WORKER
 ============================== */
 
-if ("serviceWorker" in navigator) {
+if (
+  "serviceWorker" in navigator
+) {
 
-  navigator.serviceWorker.register("/sw.js")
-
+  navigator.serviceWorker
+    .register("/sw.js")
     .then(function(registration) {
 
       console.log(
@@ -4539,7 +4142,6 @@ if ("serviceWorker" in navigator) {
       );
 
     })
-
     .catch(function(error) {
 
       console.error(
@@ -4553,7 +4155,7 @@ if ("serviceWorker" in navigator) {
 
 
 /* ==============================
-   NOTIFICATION BUTTON
+   ENABLE NOTIFICATION BUTTON
 ============================== */
 
 const notificationMessage =
@@ -4580,25 +4182,34 @@ if (notificationButton) {
 
       }
 
+      notificationButton.disabled =
+        true;
 
       try {
 
         await enablePushNotifications();
 
-
         if (notificationMessage) {
 
+          notificationMessage.style.color =
+            "#6d9b7c";
+
           notificationMessage.textContent =
-            "Notification setup finished. 🫧";
+            "Push notifications are enabled! 🔔🫧";
 
         }
 
       } catch (error) {
 
-        console.error(error);
-
+        console.error(
+          "Notification setup error:",
+          error
+        );
 
         if (notificationMessage) {
+
+          notificationMessage.style.color =
+            "#b34c6f";
 
           notificationMessage.textContent =
             "Error: " +
@@ -4606,69 +4217,202 @@ if (notificationButton) {
 
         }
 
+      } finally {
+
+        notificationButton.disabled =
+          false;
+
       }
 
     }
   );
 
 }
+
+
+/* ==============================
+   TEST PUSH NOTIFICATION
+============================== */
+
+const testPushButton =
+  document.getElementById(
+    "testPushButton"
+  );
+
+
+if (testPushButton) {
+
+  testPushButton.addEventListener(
+    "click",
+    async function() {
+
+      if (!currentUser) {
+
+        alert(
+          "Please log in first."
+        );
+
+        return;
+      }
+
+      testPushButton.disabled =
+        true;
+
+      testPushButton.textContent =
+        "Sending... 🫧";
+
+      try {
+
+        console.log(
+          "Sending test push for user:",
+          currentUser.id
+        );
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .functions
+            .invoke(
+              "clever-service",
+              {
+                body: {
+                  title:
+                    "Bubble Schedule 🫧",
+
+                  body:
+                    "Test notification — it works!"
+                }
+              }
+            );
+
+        console.log(
+          "Push test response:",
+          data
+        );
+
+        if (error) {
+
+          console.error(
+            "Push test error:",
+            error
+          );
+
+          alert(
+            "Push test failed:\n\n" +
+            error.message
+          );
+
+          return;
+        }
+
+        if (
+          data &&
+          data.error
+        ) {
+
+          console.error(
+            "Push function returned an error:",
+            data.error
+          );
+
+          alert(
+            "Push test failed:\n\n" +
+            data.error
+          );
+
+          return;
+        }
+
+        console.log(
+          "Push notification sent successfully:",
+          data
+        );
+
+        alert(
+          "Test notification sent! 🔔🫧\n\n" +
+          "Check your device for the notification."
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Push test error:",
+          error
+        );
+
+        alert(
+          "Push test failed:\n\n" +
+          error.message
+        );
+
+      } finally {
+
+        testPushButton.disabled =
+          false;
+
+        testPushButton.textContent =
+          "🧪 Send Test Notification";
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ==============================
+   SESSION
+============================== */
+
+async function checkSession() {
+
+  const {
+    data
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+  if (data.session) {
+
+    await showApp(
+      data.session.user
+    );
+
+  }
+
+}
+
+
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    async function(
+      event,
+      session
+    ) {
+
+      if (
+        session &&
+        !currentUser
+      ) {
+
+        await showApp(
+          session.user
+        );
+
+      }
+
+    }
+  );
+
+
+checkSession();
+
 </script>
-
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js")
-    .then(function(registration) {
-      console.log(
-        "Bubble Schedule notification service worker registered.",
-        registration
-      );
-    })
-    .catch(function(error) {
-      console.error(
-        "Notification service worker registration failed:",
-        error
-      );
-    });
-}
-
-const notificationMessage =
-  document.getElementById("notificationMessage");
-  const notificationButton =
-  document.getElementById("enableNotificationsButton");
-
-if (notificationButton) {
-
-  notificationButton.addEventListener("click", async function () {
-
-    if (notificationMessage) {
-      notificationMessage.textContent =
-        "Starting notification setup... 🫧";
-    }
-
-    try {
-
-      await enablePushNotifications();
-
-      if (notificationMessage) {
-        notificationMessage.textContent =
-          "Notification setup finished. 🫧";
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      if (notificationMessage) {
-        notificationMessage.textContent =
-          "Error: " + error.message;
-      }
-
-    }
-
-  });
-
-}
-  </script>
 
 </body>
 </html>
