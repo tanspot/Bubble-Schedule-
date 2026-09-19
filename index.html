@@ -4492,29 +4492,46 @@ async function enablePushNotifications() {
     const registration =
       await navigator.serviceWorker.ready;
 
-    let subscription =
-      await registration
-        .pushManager
-        .getSubscription();
+   let subscription =
+  await registration
+    .pushManager
+    .getSubscription();
 
-    if (!subscription) {
+/*
+ * VAPID keys were regenerated, so remove any
+ * existing subscription and create a fresh one.
+ */
+if (subscription) {
 
-      subscription =
-        await registration
-          .pushManager
-          .subscribe({
+  console.log(
+    "Removing old push subscription..."
+  );
 
-            userVisibleOnly:
-              true,
+  await subscription.unsubscribe();
 
-            applicationServerKey:
-              urlBase64ToUint8Array(
-                window.BUBBLE_VAPID_PUBLIC_KEY
-              )
+  subscription = null;
 
-          });
+}
 
-    }
+subscription =
+  await registration
+    .pushManager
+    .subscribe({
+
+      userVisibleOnly:
+        true,
+
+      applicationServerKey:
+        urlBase64ToUint8Array(
+          window.BUBBLE_VAPID_PUBLIC_KEY
+        )
+
+    });
+
+console.log(
+  "Created new push subscription:",
+  subscription
+);
 
     const subscriptionJson =
       subscription.toJSON();
